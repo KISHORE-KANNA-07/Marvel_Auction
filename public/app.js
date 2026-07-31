@@ -1,0 +1,737 @@
+// Client-side Application Script
+const socket = io();
+
+// Client State
+let myId = null;
+let isHost = false;
+let selectedAvatar = '🦸';
+let collapsedSquads = {}; // playerId -> boolean (true if collapsed)
+let currentTimerMax = 15;
+
+// Web Audio API Sound Synthesizer
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playSound(type) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    
+    // Resume context if suspended (browser security autoplays)
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    
+    const now = audioCtx.currentTime;
+    
+    if (type === 'bid') {
+      // Upward electronic beep-boop
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(783.99, now + 0.08); // G5
+      
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } 
+    else if (type === 'sold') {
+      // Triumphant chime
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+      osc.frequency.setValueAtTime(880.00, now + 0.2); // A5
+      
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } 
+    else if (type === 'unsold') {
+      // Downward buzzer
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.setValueAtTime(220.00, now); // A3
+      osc.frequency.linearRampToValueAtTime(110.00, now + 0.4); // A2
+      
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+      
+      osc.start(now);
+      osc.stop(now + 0.45);
+    }
+    else if (type === 'warning') {
+      // Short clock tick
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.setValueAtTime(1000, now);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      
+      osc.start(now);
+      osc.stop(now + 0.06);
+    }
+    else if (type === 'victory') {
+      // Fanfare
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C Major
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+        gain.gain.setValueAtTime(0.1, now + idx * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.3);
+        
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + 0.3);
+      });
+    }
+  } catch (e) {
+    console.warn("Audio synthesis failed:", e);
+  }
+}
+
+// Avatar selection handler
+function selectAvatar(emoji) {
+  selectedAvatar = emoji;
+  const options = document.querySelectorAll('.avatar-option');
+  options.forEach(opt => {
+    if (opt.textContent === emoji) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+}
+
+// Send Join Request
+function joinGame() {
+  const nameInput = document.getElementById('player-name');
+  const name = nameInput.value.trim();
+  
+  if (name.length === 0) return;
+  
+  // Synthesize sound context
+  initAudio();
+  
+  socket.emit('join', {
+    name: name,
+    avatar: selectedAvatar
+  });
+}
+
+// Socket Response: Welcome
+socket.on('joined-lobby', (data) => {
+  myId = data.playerId;
+  isHost = data.isHost;
+  
+  // Transition screens
+  document.getElementById('lobby-screen').classList.remove('active');
+  document.getElementById('game-screen').classList.add('active');
+});
+
+// Main State Updates
+socket.on('state-update', (state) => {
+  renderHeader(state);
+  renderLobbyWait(state);
+  renderActiveAuction(state);
+  renderSoldState(state);
+  renderFinishedState(state);
+  renderLeaderboardAndSquads(state);
+});
+
+// Update Header details
+function renderHeader(state) {
+  const countSpan = document.getElementById('player-count');
+  const totalPlayers = Object.keys(state.players).length;
+  countSpan.textContent = totalPlayers;
+  
+  // Render personal profile info
+  const myPlayerInfo = state.players[myId];
+  if (myPlayerInfo) {
+    document.getElementById('my-avatar').textContent = myPlayerInfo.avatar;
+    document.getElementById('my-name').textContent = myPlayerInfo.name;
+    document.getElementById('my-budget').textContent = `$${myPlayerInfo.budget}M`;
+    
+    // Toggle host labels
+    isHost = myPlayerInfo.isHost;
+    const hostControls = document.querySelectorAll('.host-only-controls');
+    hostControls.forEach(el => {
+      if (isHost) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    });
+    
+    const hostBar = document.getElementById('host-control-bar');
+    if (isHost && state.status !== 'LOBBY') {
+      hostBar.classList.remove('hidden');
+      // Update pause text
+      const pauseBtn = document.getElementById('btn-host-pause');
+      if (state.isPaused) {
+        pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+        pauseBtn.className = 'btn btn-sm btn-accent';
+      } else {
+        pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+        pauseBtn.className = 'btn btn-sm btn-secondary';
+      }
+    } else {
+      hostBar.classList.add('hidden');
+    }
+  }
+}
+
+// Render LOBBY WAIT state panel
+function renderLobbyWait(state) {
+  const panel = document.getElementById('state-waiting');
+  
+  if (state.status === 'LOBBY') {
+    panel.classList.add('active');
+    
+    const msg = document.getElementById('waiting-status-msg');
+    const totalPlayers = Object.keys(state.players).length;
+    
+    if (isHost) {
+      msg.innerHTML = `You are the <strong>Host</strong>! We have <strong>${totalPlayers}</strong> player(s) in the lobby.<br>Press the button below when everyone is connected.`;
+    } else {
+      msg.innerHTML = `Connected players in lobby: <strong>${totalPlayers}</strong>.<br>Waiting for the host to initiate the Marvel Auction Championship...`;
+    }
+  } else {
+    panel.classList.remove('active');
+  }
+}
+
+// Render ACTIVE AUCTION panel
+function renderActiveAuction(state) {
+  const panel = document.getElementById('state-auction');
+  
+  if (state.status === 'AUCTION') {
+    panel.classList.add('active');
+    
+    const character = state.characters[state.currentIndex];
+    
+    // Setup color configurations
+    const cardWrapper = document.getElementById('char-card-wrapper');
+    const colorTheme = character.color || '#e50914';
+    cardWrapper.style.setProperty('--card-theme-color', colorTheme);
+    cardWrapper.style.background = character.gradient || `linear-gradient(135deg, ${colorTheme}, #000000)`;
+    
+    // Set character properties
+    document.getElementById('char-role').textContent = character.role;
+    document.getElementById('char-emoji').textContent = character.emoji;
+    document.getElementById('char-name').textContent = character.name;
+    document.getElementById('char-desc').textContent = character.description;
+    
+    // Render Stats
+    document.getElementById('stat-pwr').style.width = `${character.stats.power}%`;
+    document.getElementById('val-pwr').textContent = character.stats.power;
+    
+    document.getElementById('stat-int').style.width = `${character.stats.intelligence}%`;
+    document.getElementById('val-int').textContent = character.stats.intelligence;
+    
+    document.getElementById('stat-spd').style.width = `${character.stats.speed}%`;
+    document.getElementById('val-spd').textContent = character.stats.speed;
+    
+    document.getElementById('stat-dur').style.width = `${character.stats.durability}%`;
+    document.getElementById('val-dur').textContent = character.stats.durability;
+    
+    document.getElementById('stat-cmb').style.width = `${character.stats.combat}%`;
+    document.getElementById('val-cmb').textContent = character.stats.combat;
+    
+    // Bids & high bidders
+    document.getElementById('current-bid').textContent = `$${state.currentBid}M`;
+    
+    const bidderId = state.currentBidder;
+    const bidderLabel = document.getElementById('high-bidder-name');
+    const feedbackTip = document.getElementById('bid-status-tip');
+    
+    if (bidderId) {
+      const bidder = state.players[bidderId];
+      if (bidder) {
+        bidderLabel.innerHTML = `High Bidder: <span style="color:${bidder.color}; font-weight:800;">${bidder.name}</span>`;
+        
+        // Show local status feedback
+        if (bidderId === myId) {
+          feedbackTip.textContent = "You hold the high bid! 👑";
+          feedbackTip.className = "bid-feedback-message active";
+        } else {
+          feedbackTip.className = "bid-feedback-message";
+        }
+      }
+    } else {
+      bidderLabel.textContent = "Opening Bid (Base Price)";
+      feedbackTip.className = "bid-feedback-message";
+    }
+    
+    // Setup bid button pricing options
+    const plus1 = state.currentBid + 1;
+    const plus5 = state.currentBid + 5;
+    const plus10 = state.currentBid + 10;
+    
+    document.getElementById('btn-bid-val-1').textContent = `Bid $${plus1}M`;
+    document.getElementById('btn-bid-val-2').textContent = `Bid $${plus5}M`;
+    document.getElementById('btn-bid-val-3').textContent = `Bid $${plus10}M`;
+    
+  } else {
+    panel.classList.remove('active');
+  }
+}
+
+// Render SOLD / UNSOLD view
+function renderSoldState(state) {
+  const panel = document.getElementById('state-sold');
+  
+  if (state.status === 'SOLD') {
+    panel.classList.add('active');
+    
+    const character = state.characters[state.currentIndex];
+    const bidderId = state.currentBidder;
+    
+    // Set circle emoji & color styling
+    const circle = document.getElementById('sold-char-circle');
+    circle.textContent = character.emoji;
+    const colorTheme = character.color || '#e50914';
+    circle.style.setProperty('--card-theme-color', colorTheme);
+    
+    document.getElementById('sold-char-name').textContent = character.name;
+    
+    const title = document.getElementById('sold-title');
+    const desc = document.getElementById('sold-winner-msg');
+    
+    if (bidderId && state.players[bidderId]) {
+      const buyer = state.players[bidderId];
+      title.textContent = "SOLD!";
+      title.style.color = "var(--cosmic-gold)";
+      desc.innerHTML = `Acquired by <span style="color:${buyer.color}; font-weight:800;">${buyer.name}</span> for <strong>$${state.currentBid}M</strong>`;
+    } else {
+      title.textContent = "UNSOLD";
+      title.style.color = "var(--danger-pink)";
+      desc.innerHTML = `No bids placed. The character returns to the deck.`;
+    }
+  } else {
+    panel.classList.remove('active');
+  }
+}
+
+// Render COMPLETED game state
+function renderFinishedState(state) {
+  const panel = document.getElementById('state-finished');
+  
+  if (state.status === 'FINISHED') {
+    panel.classList.add('active');
+    
+    // Find winner logic
+    let winner = null;
+    let maxSpent = -1;
+    let squadSize = 0;
+    
+    Object.values(state.players).forEach(p => {
+      const spent = p.squad.reduce((sum, item) => sum + item.price, 0);
+      if (spent > maxSpent && p.squad.length > 0) {
+        maxSpent = spent;
+        winner = p;
+        squadSize = p.squad.length;
+      }
+    });
+    
+    const nameEl = document.getElementById('end-winner-name');
+    const statsEl = document.getElementById('end-winner-stats');
+    
+    if (winner) {
+      nameEl.textContent = winner.name;
+      nameEl.style.color = winner.color;
+      statsEl.textContent = `Squad Value: $${maxSpent}M (${squadSize} characters drafted)`;
+    } else {
+      nameEl.textContent = "No Drafts!";
+      statsEl.textContent = "No players made successful purchases.";
+    }
+  } else {
+    panel.classList.remove('active');
+  }
+}
+
+// Render Leaderboard & Squad accordion Lists
+function renderLeaderboardAndSquads(state) {
+  const players = Object.values(state.players);
+  
+  // Sort players by budget or squad count
+  const sortedPlayers = [...players].sort((a, b) => b.squad.length - a.squad.length);
+  
+  // Render Leaderboard
+  const listEl = document.getElementById('leaderboard-list');
+  listEl.innerHTML = '';
+  
+  sortedPlayers.forEach(p => {
+    const isCurrentUser = p.id === myId;
+    const item = document.createElement('div');
+    item.className = `leaderboard-item ${isCurrentUser ? 'mine' : ''}`;
+    item.style.borderLeft = `4px solid ${p.color}`;
+    
+    item.innerHTML = `
+      <div class="lead-left">
+        <span class="lead-avatar">${p.avatar}</span>
+        <span class="lead-name" style="color:${p.color}">${p.name} ${p.isHost ? '<i class="fa-solid fa-crown lead-crown"></i>' : ''}</span>
+      </div>
+      <div class="lead-right">
+        <span class="lead-squad-count">${p.squad.length} Squad</span>
+        <span class="lead-budget">$${p.budget}M</span>
+      </div>
+    `;
+    listEl.appendChild(item);
+  });
+  
+  // Render Squad Accordions
+  const squadEl = document.getElementById('squad-view-accordion');
+  squadEl.innerHTML = '';
+  
+  sortedPlayers.forEach(p => {
+    const isCollapsed = collapsedSquads[p.id] === undefined ? true : collapsedSquads[p.id];
+    const totalSpent = p.squad.reduce((sum, item) => sum + item.price, 0);
+    
+    const card = document.createElement('div');
+    card.className = 'squad-player-card';
+    card.style.borderLeft = `4px solid ${p.color}`;
+    
+    // Build characters list HTML
+    let charListHtml = '';
+    if (p.squad.length === 0) {
+      charListHtml = `<div class="squad-empty-txt">No characters drafted yet.</div>`;
+    } else {
+      charListHtml = `<div class="squad-item-grid">`;
+      p.squad.forEach(c => {
+        charListHtml += `
+          <div class="squad-char-row" style="background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, ${c.gradient ? c.gradient.substring(c.gradient.indexOf('#')) : 'rgba(255,255,255,0.05)'} 100%)">
+            <div class="scr-left">
+              <span>${c.emoji}</span>
+              <span>${c.name}</span>
+              <span class="scr-role">${c.role}</span>
+            </div>
+            <div class="scr-price">$${c.price}M</div>
+          </div>
+        `;
+      });
+      charListHtml += `</div>`;
+    }
+    
+    card.innerHTML = `
+      <div class="squad-player-header" onclick="toggleSquadCollapse('${p.id}')">
+        <div class="sph-left">
+          <span>${p.avatar}</span>
+          <span style="color:${p.color}">${p.name}</span>
+        </div>
+        <div class="sph-right">
+          <span>Spent: $${totalSpent}M</span>
+          <i class="fa-solid fa-chevron-${isCollapsed ? 'down' : 'up'}"></i>
+        </div>
+      </div>
+      <div class="squad-player-body ${isCollapsed ? '' : 'active'}">
+        ${charListHtml}
+      </div>
+    `;
+    squadEl.appendChild(card);
+  });
+}
+
+function toggleSquadCollapse(playerId) {
+  collapsedSquads[playerId] = !collapsedSquads[playerId];
+  // Rerender lists using cache state
+  socket.emit('emoji-react', ''); // Dummy trigger to trigger state sync logic locally, or just trigger manually:
+  if (gameStateCache) {
+    renderLeaderboardAndSquads(gameStateCache);
+  }
+}
+
+let gameStateCache = null;
+socket.on('state-update', (state) => {
+  gameStateCache = state;
+});
+
+// Quick Bid trigger
+function placeBidOffset(offset) {
+  if (!gameStateCache) return;
+  const bidAmount = gameStateCache.currentBid + offset;
+  socket.emit('place-bid', { amount: bidAmount });
+}
+
+// Host controls trigger
+function sendHostAction(action) {
+  socket.emit('host-action', action);
+}
+
+// Client Tab toggling on mobile view
+function switchTab(tab) {
+  const chatBtn = document.getElementById('tab-btn-chat');
+  const squadsBtn = document.getElementById('tab-btn-squads');
+  const chatPanel = document.getElementById('tab-content-chat');
+  const squadsPanel = document.getElementById('tab-content-squads');
+  
+  if (tab === 'chat') {
+    chatBtn.classList.add('active');
+    squadsBtn.classList.remove('active');
+    chatPanel.classList.add('active');
+    squadsPanel.classList.remove('active');
+  } else {
+    chatBtn.classList.remove('active');
+    squadsBtn.classList.add('active');
+    chatPanel.classList.remove('active');
+    squadsPanel.classList.add('active');
+  }
+}
+
+// Chat system
+function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (text.length === 0) return;
+  
+  socket.emit('chat-message', text);
+  input.value = '';
+}
+
+// Receive and render chat & bid messages
+socket.on('chat-message', (msg) => {
+  const chatMsgs = document.getElementById('chat-messages');
+  const isMine = msg.name === (gameStateCache?.players[myId]?.name);
+  
+  const element = document.createElement('div');
+  
+  if (msg.isSystem) {
+    element.className = 'chat-system';
+    element.innerHTML = `${msg.message}`;
+  } else {
+    element.className = `chat-bubble ${isMine ? 'mine' : ''}`;
+    element.innerHTML = `
+      <div class="chat-meta">
+        <span class="chat-name" style="color:${msg.color}">${msg.name}</span>
+        <span class="chat-time">${msg.timestamp}</span>
+      </div>
+      <div class="chat-text">${msg.message}</div>
+    `;
+  }
+  
+  chatMsgs.appendChild(element);
+  
+  // Auto scroll to bottom
+  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+});
+
+// Host/Bid updates
+socket.on('bid-update', (data) => {
+  // Play short chime sound on bids
+  playSound('bid');
+  
+  // Shake active character card to indicate hot action!
+  const card = document.getElementById('char-card');
+  if (card) {
+    card.classList.remove('shake-element');
+    void card.offsetWidth; // Trigger reflow to restart animation
+    card.classList.add('shake-element');
+  }
+});
+
+// Error Alerts
+socket.on('error-msg', (msg) => {
+  // Play buzzer sound
+  playSound('warning');
+  
+  // Build a sleek floating toast notification
+  const toast = document.createElement('div');
+  toast.className = 'chat-system';
+  toast.style.background = 'rgba(244, 63, 94, 0.2)';
+  toast.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+  toast.style.color = 'var(--danger-pink)';
+  toast.style.position = 'fixed';
+  toast.style.bottom = '100px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.zIndex = '99999';
+  toast.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.5s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 500);
+  }, 2500);
+});
+
+// Update SVG timer clock
+socket.on('timer-update', (data) => {
+  const timerNum = document.getElementById('timer-countdown');
+  const timerCircle = document.getElementById('timer-progress');
+  const timerBox = document.getElementById('timer-ring-container');
+  const soldTimerNum = document.getElementById('sold-countdown-num');
+  
+  if (soldTimerNum) {
+    soldTimerNum.textContent = data.timer;
+  }
+  
+  if (timerNum && timerCircle) {
+    timerNum.textContent = data.timer;
+    
+    // Circle math
+    const totalCircumference = 283;
+    const offset = totalCircumference - (data.timer / currentTimerMax) * totalCircumference;
+    timerCircle.style.strokeDashoffset = offset;
+    
+    // Warning state when timer is low
+    if (data.timer <= 5) {
+      timerBox.classList.add('warning');
+      const isAuction = gameStateCache && gameStateCache.status === 'AUCTION';
+      if (isAuction) playSound('warning');
+    } else {
+      timerBox.classList.remove('warning');
+    }
+  }
+});
+
+// Emoji Reacts Sender
+function sendEmoji(emoji) {
+  socket.emit('emoji-react', emoji);
+}
+
+// Emoji Reaction Bursts Renderer
+socket.on('emoji-burst', (data) => {
+  if (!data.emoji) return; // Skip dummy trigger
+  
+  const container = document.getElementById('emoji-burst-container');
+  const reactEl = document.createElement('div');
+  reactEl.className = 'floating-reaction';
+  reactEl.textContent = data.emoji;
+  
+  // Random start coordinates at bottom
+  const randomXStart = Math.random() * 80 + 10; // between 10% and 90% width
+  reactEl.style.left = `${randomXStart}vw`;
+  
+  // Randomize floating vector drift paths (X offset)
+  const driftX = (Math.random() - 0.5) * 40; // drift up to 20vw left/right
+  const driftXFinal = driftX * 1.5 + (Math.random() - 0.5) * 20;
+  
+  reactEl.style.setProperty('--x-path', `${driftX}vw`);
+  reactEl.style.setProperty('--x-path-final', `${driftXFinal}vw`);
+  
+  // Random sizing
+  const size = Math.random() * 1.2 + 0.8; // size multiplier
+  reactEl.style.transform = `scale(${size})`;
+  
+  container.appendChild(reactEl);
+  
+  // Remove element after animation ends
+  setTimeout(() => {
+    reactEl.remove();
+  }, 2500);
+});
+
+// Confetti Particle Celebration Engine
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let confettiInterval = null;
+
+function resizeConfettiCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', resizeConfettiCanvas);
+resizeConfettiCanvas();
+
+class ConfettiParticle {
+  constructor(colors) {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height - 20;
+    this.size = Math.random() * 8 + 4;
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.speedY = Math.random() * 3 + 2;
+    this.speedX = (Math.random() - 0.5) * 4;
+    this.rotation = Math.random() * 360;
+    this.rotationSpeed = (Math.random() - 0.5) * 5;
+  }
+  
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.rotation += this.rotationSpeed;
+  }
+  
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate((this.rotation * Math.PI) / 180);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+function startConfetti(colorTheme) {
+  canvas.style.display = 'block';
+  particles = [];
+  
+  const colorsList = [colorTheme, '#ffffff', '#fbbf24', '#00f2fe', '#f43f5e'];
+  
+  // Generate particles
+  for (let i = 0; i < 150; i++) {
+    particles.push(new ConfettiParticle(colorsList));
+  }
+  
+  if (confettiInterval) clearInterval(confettiInterval);
+  
+  confettiInterval = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let allFinished = true;
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+      if (p.y < canvas.height) allFinished = false;
+    });
+    
+    if (allFinished) {
+      clearInterval(confettiInterval);
+      confettiInterval = null;
+      canvas.style.display = 'none';
+    }
+  }, 1000 / 60);
+}
+
+socket.on('celebration', (data) => {
+  if (data.type === 'sold') {
+    playSound('sold');
+    startConfetti(data.gradient ? data.gradient.substring(data.gradient.indexOf('#')) : '#fbbf24');
+  } 
+  else if (data.type === 'unsold') {
+    playSound('unsold');
+  }
+  else if (data.type === 'end') {
+    playSound('victory');
+    startConfetti('#fbbf24');
+  }
+});

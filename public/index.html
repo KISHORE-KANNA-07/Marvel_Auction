@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marvel Auction - Realtime Multiplayer Championship</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Core stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Animated Glow Grid -->
+  <div class="bg-glow-container">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app" class="app-container">
+
+    <!-- 1. LOBBY OVERLAY -->
+    <div id="lobby-screen" class="screen active">
+      <div class="lobby-card glass-panel">
+        <div class="logo-container">
+          <h1 class="marvel-title">MARVEL</h1>
+          <h2 class="auction-subtitle">AUCTION</h2>
+          <div class="glow-bar"></div>
+        </div>
+        
+        <p class="lobby-desc">Enter your superhero alias and select an avatar to join the live auction room.</p>
+        
+        <form id="lobby-form" onsubmit="event.preventDefault(); joinGame();">
+          <div class="form-group">
+            <label for="player-name">YOUR ALIAS</label>
+            <input type="text" id="player-name" maxlength="16" placeholder="e.g. TonyStark" required autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label>CHOOSE AVATAR</label>
+            <div class="avatar-grid">
+              <div class="avatar-option active" onclick="selectAvatar('🦸')">🦸</div>
+              <div class="avatar-option" onclick="selectAvatar('🦹')">🦹</div>
+              <div class="avatar-option" onclick="selectAvatar('🤖')">🤖</div>
+              <div class="avatar-option" onclick="selectAvatar('🕷️')">🕷️</div>
+              <div class="avatar-option" onclick="selectAvatar('⚡')">⚡</div>
+              <div class="avatar-option" onclick="selectAvatar('🧙‍♂️')">🧙‍♂️</div>
+              <div class="avatar-option" onclick="selectAvatar('🐱')">🐱</div>
+              <div class="avatar-option" onclick="selectAvatar('👽')">👽</div>
+              <div class="avatar-option" onclick="selectAvatar('🦁')">🦁</div>
+              <div class="avatar-option" onclick="selectAvatar('💀')">💀</div>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-glow btn-large">
+            <span>ENTER AUCTION LOBBY</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. GAME SCREEN -->
+    <div id="game-screen" class="screen">
+      
+      <!-- Top Header Bar -->
+      <header class="app-header glass-panel">
+        <div class="header-logo">
+          <span class="red-badge">MARVEL</span>
+          <span class="logo-txt">AUCTION</span>
+        </div>
+        
+        <div class="header-right">
+          <div class="lobby-count-badge">
+            <i class="fa-solid fa-users"></i>
+            <span id="player-count">0</span> Players
+          </div>
+          
+          <div class="user-profile-badge" id="profile-badge">
+            <span class="user-avatar" id="my-avatar">🦸</span>
+            <div class="user-info">
+              <span class="user-name" id="my-name">TonyStark</span>
+              <span class="user-budget" id="my-budget">$100M</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Game Grid -->
+      <main class="game-grid">
+
+        <!-- Column Left: Character / Bid Area -->
+        <section class="left-section">
+          
+          <!-- State Panel: Waiting for Start -->
+          <div id="state-waiting" class="status-panel glass-panel active">
+            <div class="pulse-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <h2>WAITING FOR GAME TO START</h2>
+            <p id="waiting-status-msg">Waiting for the host to initiate the draft...</p>
+            <div id="host-start-zone" class="host-only-controls hidden">
+              <button onclick="sendHostAction('start')" class="btn btn-accent btn-glow">
+                <i class="fa-solid fa-play"></i> START DRAFT CHAMPIONSHIP
+              </button>
+            </div>
+          </div>
+
+          <!-- State Panel: Active Auction -->
+          <div id="state-auction" class="status-panel">
+            
+            <!-- Character Card Container -->
+            <div class="card-glow-wrapper" id="char-card-wrapper">
+              <div class="character-card glass-panel" id="char-card">
+                <div class="card-header">
+                  <span class="char-role-badge" id="char-role">Avenger</span>
+                  <span class="char-emoji-badge" id="char-emoji">🤖</span>
+                </div>
+                
+                <h2 class="char-name" id="char-name">Iron Man</h2>
+                <p class="char-desc" id="char-desc">Genius, billionaire, playboy, philanthropist.</p>
+                
+                <!-- Stats Radar/Bars -->
+                <div class="char-stats">
+                  <div class="stat-row">
+                    <span class="stat-label">PWR</span>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-pwr" style="width: 85%;"></div></div>
+                    <span class="stat-val" id="val-pwr">85</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">INT</span>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-int" style="width: 100%;"></div></div>
+                    <span class="stat-val" id="val-int">100</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">SPD</span>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-spd" style="width: 80%;"></div></div>
+                    <span class="stat-val" id="val-spd">80</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">DUR</span>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-dur" style="width: 85%;"></div></div>
+                    <span class="stat-val" id="val-dur">85</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">CMB</span>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-cmb" style="width: 70%;"></div></div>
+                    <span class="stat-val" id="val-cmb">70</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bid Controls Zone -->
+            <div class="bid-controls-panel glass-panel">
+              
+              <!-- Timer / Current Bid Area -->
+              <div class="bidding-header">
+                <div class="current-price-box">
+                  <span class="label">CURRENT BID</span>
+                  <div class="price-val" id="current-bid">$10M</div>
+                  <span class="high-bidder-label" id="high-bidder-name">No bids yet</span>
+                </div>
+                
+                <div class="timer-box" id="timer-ring-container">
+                  <svg class="timer-svg" viewBox="0 0 100 100">
+                    <circle class="timer-circle-bg" cx="50" cy="50" r="45"/>
+                    <circle class="timer-circle-fill" id="timer-progress" cx="50" cy="50" r="45"/>
+                  </svg>
+                  <div class="timer-num" id="timer-countdown">15</div>
+                </div>
+              </div>
+
+              <!-- Quick Bid Buttons -->
+              <div class="bid-action-buttons">
+                <button onclick="placeBidOffset(1)" class="btn btn-bid">
+                  <span class="btn-sub">+ $1M</span>
+                  <span id="btn-bid-val-1">Bid $11M</span>
+                </button>
+                <button onclick="placeBidOffset(5)" class="btn btn-bid">
+                  <span class="btn-sub">+ $5M</span>
+                  <span id="btn-bid-val-2">Bid $15M</span>
+                </button>
+                <button onclick="placeBidOffset(10)" class="btn btn-bid">
+                  <span class="btn-sub">+ $10M</span>
+                  <span id="btn-bid-val-3">Bid $20M</span>
+                </button>
+              </div>
+              
+              <div class="bid-feedback-message" id="bid-status-tip">
+                You are currently holding the high bid! 👑
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- State Panel: Sold / Unsold -->
+          <div id="state-sold" class="status-panel glass-panel">
+            <div class="sold-announcement">
+              <h1 id="sold-title">SOLD!</h1>
+              <div class="sold-char-circle" id="sold-char-circle">🤖</div>
+              <h2 id="sold-char-name">Iron Man</h2>
+              <p class="sold-to-msg" id="sold-winner-msg">Sold to TonyStark for $15M</p>
+            </div>
+            
+            <div id="host-next-zone" class="host-only-controls hidden">
+              <button onclick="sendHostAction('next')" class="btn btn-accent btn-glow">
+                NEXT CHARACTER <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+            <div class="waiting-host-notice" id="bidder-next-notice">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Next character in <span id="sold-countdown-num">5</span>s...
+            </div>
+          </div>
+
+          <!-- State Panel: Game Finished -->
+          <div id="state-finished" class="status-panel glass-panel">
+            <div class="winner-announcement">
+              <i class="fa-solid fa-trophy trophy-huge"></i>
+              <h1>DRAFT CHAMPIONSHIP COMPLETED</h1>
+              <p>The final squad compositions are locked in!</p>
+              
+              <div class="winner-highlight" id="end-winner-badge">
+                <span class="label">GRAND WINNER</span>
+                <h2 id="end-winner-name">TonyStark</h2>
+                <span class="sub" id="end-winner-stats">Total Spent: $82M</span>
+              </div>
+              
+              <div id="host-reset-zone" class="host-only-controls hidden">
+                <button onclick="sendHostAction('reset')" class="btn btn-danger">
+                  <i class="fa-solid fa-rotate-left"></i> RESTART NEW AUCTION
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Host Control Floating Bar (Only shown to Host) -->
+          <div id="host-control-bar" class="host-bar glass-panel hidden">
+            <span class="host-title"><i class="fa-solid fa-crown text-yellow"></i> Host Controller</span>
+            <div class="host-buttons">
+              <button id="btn-host-pause" onclick="sendHostAction('pause')" class="btn btn-sm btn-secondary" title="Pause/Resume Auction">
+                <i class="fa-solid fa-pause"></i> Pause
+              </button>
+              <button id="btn-host-sell" onclick="sendHostAction('sell')" class="btn btn-sm btn-accent" title="Force Sold Instantly">
+                <i class="fa-solid fa-gavel"></i> Sold
+              </button>
+              <button onclick="sendHostAction('reset')" class="btn btn-sm btn-danger" title="Reset Game State">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Column Right: Chat, Emojis & Leaderboard -->
+        <section class="right-section">
+          
+          <!-- Mobile Drawer Tabs (Toggle between Chat/Bids and Leaderboards/Squads) -->
+          <div class="tab-selectors">
+            <button id="tab-btn-chat" class="tab-btn active" onclick="switchTab('chat')">
+              <i class="fa-solid fa-comments"></i> CHAT & BIDS
+            </button>
+            <button id="tab-btn-squads" class="tab-btn" onclick="switchTab('squads')">
+              <i class="fa-solid fa-shield-halved"></i> LEADERBOARD / SQUADS
+            </button>
+          </div>
+
+          <!-- Tab Content 1: Chat and Reactions -->
+          <div id="tab-content-chat" class="tab-panel active glass-panel">
+            <div class="chat-container">
+              <div class="chat-messages" id="chat-messages">
+                <!-- Chat & bid logs will be injected here -->
+              </div>
+              
+              <!-- Floating Emoji Trays -->
+              <div class="emoji-tray">
+                <button class="emoji-btn" onclick="sendEmoji('😂')">😂</button>
+                <button class="emoji-btn" onclick="sendEmoji('🔥')">🔥</button>
+                <button class="emoji-btn" onclick="sendEmoji('😮')">😮</button>
+                <button class="emoji-btn" onclick="sendEmoji('💸')">💸</button>
+                <button class="emoji-btn" onclick="sendEmoji('👑')">👑</button>
+                <button class="emoji-btn" onclick="sendEmoji('😱')">😱</button>
+              </div>
+
+              <!-- Input form -->
+              <form id="chat-form" class="chat-input-area" onsubmit="event.preventDefault(); sendChatMessage();">
+                <input type="text" id="chat-input" maxlength="100" placeholder="Trash talk your friends..." autocomplete="off">
+                <button type="submit" class="chat-send-btn">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Tab Content 2: Leaderboard & Squads -->
+          <div id="tab-content-squads" class="tab-panel glass-panel">
+            <div class="squads-container">
+              <h3 class="panel-section-title">LEADERBOARD</h3>
+              <div class="player-leaderboard-list" id="leaderboard-list">
+                <!-- Players, budget and squad counts -->
+              </div>
+              
+              <h3 class="panel-section-title">SQUADS VIEWER</h3>
+              <div class="squad-view-accordion" id="squad-view-accordion">
+                <!-- Player detail cards & lists of their characters -->
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- Overlay canvas for confetti particle effects -->
+  <canvas id="confetti-canvas" class="confetti-overlay"></canvas>
+  
+  <!-- Canvas container for floating emoji bursts -->
+  <div id="emoji-burst-container" class="emoji-overlay-container"></div>
+
+  <!-- Socket.io Script Served by Backend -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- Main Script -->
+  <script src="app.js"></script>
+</body>
+</html>
