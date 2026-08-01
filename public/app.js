@@ -132,17 +132,43 @@ function selectAvatar(emoji) {
   });
 }
 
-// Send Join Request
-function joinGame() {
+// Create a Party
+function createParty() {
   const nameInput = document.getElementById('player-name');
   const name = nameInput.value.trim();
+  if (name.length === 0) {
+    nameInput.reportValidity();
+    return;
+  }
   
-  if (name.length === 0) return;
-  
-  // Synthesize sound context
   initAudio();
-  
   socket.emit('join', {
+    action: 'create',
+    name: name,
+    avatar: selectedAvatar
+  });
+}
+
+// Join a Party with a Code
+function joinParty() {
+  const nameInput = document.getElementById('player-name');
+  const name = nameInput.value.trim();
+  if (name.length === 0) {
+    nameInput.reportValidity();
+    return;
+  }
+  
+  const codeInput = document.getElementById('party-code-input');
+  const code = codeInput.value.trim();
+  if (code.length === 0) {
+    codeInput.reportValidity();
+    return;
+  }
+  
+  initAudio();
+  socket.emit('join', {
+    action: 'join',
+    roomCode: code,
     name: name,
     avatar: selectedAvatar
   });
@@ -153,14 +179,35 @@ socket.on('joined-lobby', (data) => {
   myId = data.playerId;
   isHost = data.isHost;
   
+  // Update party code display
+  document.getElementById('party-code-val').textContent = data.roomCode;
+  
   // Transition screens
   document.getElementById('lobby-screen').classList.remove('active');
   document.getElementById('game-screen').classList.add('active');
 });
 
+// Copy party code helper
+function copyPartyCode() {
+  const codeVal = document.getElementById('party-code-val').textContent;
+  if (!codeVal || codeVal === '------') return;
+  
+  navigator.clipboard.writeText(codeVal).then(() => {
+    const badge = document.querySelector('.party-code-badge');
+    const origHtml = badge.innerHTML;
+    badge.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+    setTimeout(() => {
+      badge.innerHTML = origHtml;
+    }, 1500);
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+  });
+}
+
 // Main State Updates
 socket.on('state-update', (state) => {
   renderHeader(state);
+  renderRulesBoard(state);
   renderLobbyWait(state);
   renderActiveAuction(state);
   renderSoldState(state);
@@ -227,6 +274,55 @@ function renderLobbyWait(state) {
   }
 }
 
+// Helper to calculate Current Team Rating
+function calculateTeamRating(squad, mode, activeMission) {
+  if (!squad || squad.length === 0) return 0;
+  
+  let teamScore = 0;
+  squad.forEach(char => {
+    if (char.stats) {
+      let charScore = 0;
+      const { power, intelligence, speed, durability, combat } = char.stats;
+      
+      if (mode === 'MISSION' && activeMission) {
+        const w = activeMission.weights || {};
+        charScore = 
+          (power || 0) * (w.power || 0) +
+          (intelligence || 0) * (w.intelligence || 0) +
+          (speed || 0) * (w.speed || 0) +
+          (durability || 0) * (w.durability || 0) +
+          (combat || 0) * (w.combat || 0);
+          
+        // Add mission role bonus
+        if (char.role && activeMission.bonusRole && char.role.toLowerCase() === activeMission.bonusRole.toLowerCase()) {
+          charScore += activeMission.bonusAmount;
+        }
+      } else {
+        // Default / Highest Total Team Score / Budget Efficiency base rating
+        charScore = ((power || 0) + (intelligence || 0) + (speed || 0) + (durability || 0) + (combat || 0)) / 5;
+      }
+      
+      teamScore += charScore;
+    }
+  });
+  
+  if (mode === 'EFFICIENCY') {
+    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
+    return totalSpent > 0 ? parseFloat((teamScore / totalSpent).toFixed(2)) : 0;
+  }
+  
+  return Math.round(teamScore);
+}
+
+// Helper to find the lowest base price among remaining unsold heroes
+function getLowestUnsoldBasePrice(state) {
+  if (!state || !state.characters) return 9999;
+  const startIndex = state.status === 'AUCTION' ? state.currentIndex : state.currentIndex + 1;
+  const remaining = state.characters.slice(startIndex);
+  if (remaining.length === 0) return 9999;
+  return Math.min(...remaining.map(c => c.basePrice));
+}
+
 // Render ACTIVE AUCTION panel
 function renderActiveAuction(state) {
   const panel = document.getElementById('state-auction');
@@ -271,22 +367,50 @@ function renderActiveAuction(state) {
     const bidderLabel = document.getElementById('high-bidder-name');
     const feedbackTip = document.getElementById('bid-status-tip');
     
-    if (bidderId) {
-      const bidder = state.players[bidderId];
-      if (bidder) {
-        bidderLabel.innerHTML = `High Bidder: <span style="color:${bidder.color}; font-weight:800;">${bidder.name}</span>`;
-        
-        // Show local status feedback
-        if (bidderId === myId) {
-          feedbackTip.textContent = "You hold the high bid! 👑";
-          feedbackTip.className = "bid-feedback-message active";
-        } else {
-          feedbackTip.className = "bid-feedback-message";
+    // Check if current user is Out of Credits (spectator)
+    const lowestBase = getLowestUnsoldBasePrice(state);
+    const myPlayer = state.players[myId];
+    const isOut = myPlayer && myPlayer.budget < lowestBase;
+    
+    const bidButtonsContainer = document.getElementById('bid-buttons-container');
+    const oocBanner = document.getElementById('out-of-credits-banner');
+    
+    if (isOut) {
+      bidButtonsContainer.classList.add('hidden');
+      feedbackTip.classList.remove('active');
+      feedbackTip.className = "bid-feedback-message";
+      oocBanner.classList.remove('hidden');
+      
+      // Still show the high bidder info in spectator mode
+      if (bidderId) {
+        const bidder = state.players[bidderId];
+        if (bidder) {
+          bidderLabel.innerHTML = `High Bidder: <span style="color:${bidder.color}; font-weight:800;">${bidder.name}</span>`;
         }
+      } else {
+        bidderLabel.textContent = "Opening Bid (Base Price)";
       }
     } else {
-      bidderLabel.textContent = "Opening Bid (Base Price)";
-      feedbackTip.className = "bid-feedback-message";
+      bidButtonsContainer.classList.remove('hidden');
+      oocBanner.classList.add('hidden');
+      
+      if (bidderId) {
+        const bidder = state.players[bidderId];
+        if (bidder) {
+          bidderLabel.innerHTML = `High Bidder: <span style="color:${bidder.color}; font-weight:800;">${bidder.name}</span>`;
+          
+          // Show local status feedback
+          if (bidderId === myId) {
+            feedbackTip.textContent = "You hold the high bid! 👑";
+            feedbackTip.className = "bid-feedback-message active";
+          } else {
+            feedbackTip.className = "bid-feedback-message";
+          }
+        }
+      } else {
+        bidderLabel.textContent = "Opening Bid (Base Price)";
+        feedbackTip.className = "bid-feedback-message";
+      }
     }
     
     // Setup bid button pricing options
@@ -346,17 +470,15 @@ function renderFinishedState(state) {
   if (state.status === 'FINISHED') {
     panel.classList.add('active');
     
-    // Find winner logic
+    // Find winner logic by highest Team Rating
     let winner = null;
-    let maxSpent = -1;
-    let squadSize = 0;
+    let maxRating = -1;
     
     Object.values(state.players).forEach(p => {
-      const spent = p.squad.reduce((sum, item) => sum + item.price, 0);
-      if (spent > maxSpent && p.squad.length > 0) {
-        maxSpent = spent;
+      const rating = calculateTeamRating(p.squad, state.mode, state.activeMission);
+      if (rating > maxRating && p.squad.length > 0) {
+        maxRating = rating;
         winner = p;
-        squadSize = p.squad.length;
       }
     });
     
@@ -366,7 +488,13 @@ function renderFinishedState(state) {
     if (winner) {
       nameEl.textContent = winner.name;
       nameEl.style.color = winner.color;
-      statsEl.textContent = `Squad Value: $${maxSpent}M (${squadSize} characters drafted)`;
+      let label = `Current Team Rating: ${maxRating}`;
+      if (state.mode === 'EFFICIENCY') {
+        label = `Budget Efficiency Score: ${maxRating}`;
+      } else if (state.mode === 'MISSION') {
+        label = `Mission Match Score: ${maxRating}`;
+      }
+      statsEl.textContent = label;
     } else {
       nameEl.textContent = "No Drafts!";
       statsEl.textContent = "No players made successful purchases.";
@@ -380,8 +508,10 @@ function renderFinishedState(state) {
 function renderLeaderboardAndSquads(state) {
   const players = Object.values(state.players);
   
-  // Sort players by budget or squad count
-  const sortedPlayers = [...players].sort((a, b) => b.squad.length - a.squad.length);
+  // Sort players by Current Team Rating desc
+  const sortedPlayers = [...players].sort((a, b) => 
+    calculateTeamRating(b.squad, state.mode, state.activeMission) - calculateTeamRating(a.squad, state.mode, state.activeMission)
+  );
   
   // Render Leaderboard
   const listEl = document.getElementById('leaderboard-list');
@@ -393,14 +523,16 @@ function renderLeaderboardAndSquads(state) {
     item.className = `leaderboard-item ${isCurrentUser ? 'mine' : ''}`;
     item.style.borderLeft = `4px solid ${p.color}`;
     
+    const rating = calculateTeamRating(p.squad, state.mode, state.activeMission);
+    const badgeLabel = state.mode === 'EFFICIENCY' ? `⚡ Efficiency: ${rating}` : `⭐ Rating: ${rating}`;
+    
     item.innerHTML = `
       <div class="lead-left">
         <span class="lead-avatar">${p.avatar}</span>
         <span class="lead-name" style="color:${p.color}">${p.name} ${p.isHost ? '<i class="fa-solid fa-crown lead-crown"></i>' : ''}</span>
       </div>
       <div class="lead-right">
-        <span class="lead-squad-count">${p.squad.length} Squad</span>
-        <span class="lead-budget">$${p.budget}M</span>
+        <span class="lead-rating">${badgeLabel}</span>
       </div>
     `;
     listEl.appendChild(item);
@@ -484,6 +616,60 @@ function sendHostAction(action) {
   socket.emit('host-action', action);
 }
 
+function startGameWithMode() {
+  const select = document.getElementById('game-mode-select');
+  const mode = select ? select.value : 'TOTAL_SCORE';
+  socket.emit('host-action', { action: 'start', mode: mode });
+}
+
+function renderRulesBoard(state) {
+  const board = document.getElementById('rules-board');
+  if (!state || state.status === 'LOBBY') {
+    board.classList.add('hidden');
+    return;
+  }
+  
+  board.classList.remove('hidden');
+  
+  const modeEl = document.getElementById('board-mode-type');
+  const titleEl = document.getElementById('board-mission-name');
+  const weightsEl = document.getElementById('board-mission-weights');
+  const bonusEl = document.getElementById('board-mission-bonus');
+  
+  if (state.mode === 'MISSION' && state.activeMission) {
+    modeEl.textContent = "MISSION MODE";
+    titleEl.textContent = state.activeMission.name;
+    
+    // Display weights
+    let weightsHtml = '';
+    const w = state.activeMission.weights || {};
+    Object.keys(w).forEach(stat => {
+      const val = w[stat];
+      if (val > 0) {
+        weightsHtml += `<span class="weight-tag">${stat.toUpperCase()}: ${(val * 100).toFixed(0)}%</span>`;
+      }
+    });
+    weightsEl.innerHTML = weightsHtml;
+    
+    // Display bonus
+    if (state.activeMission.bonusRole) {
+      bonusEl.innerHTML = `<span class="bonus-tag"><i class="fa-solid fa-fire"></i> +${state.activeMission.bonusAmount} ${state.activeMission.bonusRole}s</span>`;
+    } else {
+      bonusEl.innerHTML = '';
+    }
+  } else if (state.mode === 'EFFICIENCY') {
+    modeEl.textContent = "BUDGET EFFICIENCY";
+    titleEl.textContent = "💰 Spend Wisely";
+    weightsEl.innerHTML = '<span class="rules-desc">Scoring: Total Team Score / Total Credits Spent</span>';
+    bonusEl.innerHTML = '';
+  } else {
+    modeEl.textContent = "CHAMPIONSHIP DRAFT";
+    titleEl.textContent = "🏆 Highest Total Score";
+    weightsEl.innerHTML = '<span class="rules-desc">Scoring: Sum of all character average attributes</span>';
+    bonusEl.innerHTML = '';
+  }
+}
+
 // Client Tab toggling on mobile view
 function switchTab(tab) {
   const chatBtn = document.getElementById('tab-btn-chat');
@@ -537,8 +723,11 @@ socket.on('chat-message', (msg) => {
   
   chatMsgs.appendChild(element);
   
-  // Auto scroll to bottom
-  chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  // Auto scroll to bottom smoothly
+  chatMsgs.scrollTo({
+    top: chatMsgs.scrollHeight,
+    behavior: 'smooth'
+  });
 });
 
 // Host/Bid updates

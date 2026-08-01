@@ -41,134 +41,335 @@ function shuffleArray(array) {
   return array;
 }
 
-// Initial Game State
-let gameState = {
-  status: 'LOBBY', // LOBBY, AUCTION, SOLD, FINISHED
-  players: {},     // socket.id -> { id, name, budget: 100, squad: [], avatar, isHost, color }
-  characters: [],
-  currentIndex: -1,
-  currentBid: 0,
-  currentBidder: null, // socket.id
-  bidHistory: [],      // array of { bidderName, bidAmount, timestamp }
-  chatHistory: [],     // array of { name, message, isSystem, timestamp, color, emoji }
-  timer: 0,
-  isPaused: false
-};
+// Initial Game State Map
+const rooms = {};
 
 const DEFAULT_BUDGET = 100; // $100 Million
 const COUNTDOWN_SECONDS = 15; // default countdown length
 const MINI_COUNTDOWN_SECONDS = 8; // reset to this if bid is in final seconds
-let timerInterval = null;
 
-// Clean / Reset game state
-function resetGameState() {
-  stopTimer();
-  gameState.status = 'LOBBY';
-  gameState.currentIndex = -1;
-  gameState.currentBid = 0;
-  gameState.currentBidder = null;
-  gameState.bidHistory = [];
-  gameState.isPaused = false;
-  gameState.timer = 0;
-  gameState.characters = shuffleArray(JSON.parse(JSON.stringify(characters))); // deep copy & shuffle
+const MISSION_POOL = [
+  {
+    id: 1,
+    name: "Defeat Thanos",
+    weights: { power: 0.4, combat: 0.3, durability: 0.2, speed: 0.1, intelligence: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 2,
+    name: "Save New York",
+    weights: { speed: 0.4, intelligence: 0.3, combat: 0.2, durability: 0.1, power: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 3,
+    name: "Secret Infiltration",
+    weights: { intelligence: 0.5, speed: 0.3, combat: 0.2, power: 0.0, durability: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 4,
+    name: "Defend Wakanda",
+    weights: { durability: 0.45, combat: 0.3, power: 0.25, speed: 0.0, intelligence: 0.0 },
+    bonusRole: "Avenger",
+    bonusAmount: 15
+  },
+  {
+    id: 5,
+    name: "Battle Royale",
+    weights: { power: 0.3, combat: 0.3, durability: 0.2, speed: 0.2, intelligence: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 6,
+    name: "Infinity Stone Hunt",
+    weights: { speed: 0.4, intelligence: 0.35, power: 0.15, combat: 0.1, durability: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 7,
+    name: "Cosmic Crisis",
+    weights: { power: 0.35, durability: 0.3, intelligence: 0.2, combat: 0.15, speed: 0.0 },
+    bonusRole: "Cosmic",
+    bonusAmount: 20
+  },
+  {
+    id: 8,
+    name: "Mutant Uprising",
+    weights: { power: 0.2, intelligence: 0.2, speed: 0.2, durability: 0.2, combat: 0.2 },
+    bonusRole: "Mutant",
+    bonusAmount: 25
+  },
+  {
+    id: 9,
+    name: "Avengers Assemble",
+    weights: { power: 0.2, intelligence: 0.2, speed: 0.2, durability: 0.2, combat: 0.2 },
+    bonusRole: "Avenger",
+    bonusAmount: 15
+  },
+  {
+    id: 10,
+    name: "Villain Invasion",
+    weights: { power: 0.2, intelligence: 0.2, speed: 0.2, durability: 0.2, combat: 0.2 },
+    bonusRole: "Villain",
+    bonusAmount: 20
+  },
+  {
+    id: 11,
+    name: "Zombie Apocalypse",
+    weights: { durability: 0.45, combat: 0.3, intelligence: 0.15, power: 0.1, speed: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 12,
+    name: "Prison Break",
+    weights: { combat: 0.35, speed: 0.35, intelligence: 0.3, power: 0.0, durability: 0.0 },
+    bonusRole: null,
+    bonusAmount: 0
+  },
+  {
+    id: 13,
+    name: "Multiverse Chaos",
+    weights: {}, // dynamically generated
+    bonusRole: null,
+    bonusAmount: 0
+  }
+];
+
+function generateRandomWeights() {
+  const keys = ['power', 'intelligence', 'speed', 'durability', 'combat'];
+  const cuts = [];
+  for (let i = 0; i < 4; i++) {
+    cuts.push(Math.floor(Math.random() * 101));
+  }
+  cuts.sort((a, b) => a - b);
+  
+  return {
+    power: cuts[0] / 100,
+    intelligence: (cuts[1] - cuts[0]) / 100,
+    speed: (cuts[2] - cuts[1]) / 100,
+    durability: (cuts[3] - cuts[2]) / 100,
+    combat: (100 - cuts[3]) / 100
+  };
+}
+
+function calculateScore(squad, mode, activeMission) {
+  if (!squad || squad.length === 0) return 0;
+  
+  let teamScore = 0;
+  squad.forEach(char => {
+    if (char.stats) {
+      let charScore = 0;
+      const { power, intelligence, speed, durability, combat } = char.stats;
+      
+      if (mode === 'MISSION' && activeMission) {
+        const w = activeMission.weights || {};
+        charScore = 
+          (power || 0) * (w.power || 0) +
+          (intelligence || 0) * (w.intelligence || 0) +
+          (speed || 0) * (w.speed || 0) +
+          (durability || 0) * (w.durability || 0) +
+          (combat || 0) * (w.combat || 0);
+          
+        // Add mission role bonus
+        if (char.role && activeMission.bonusRole && char.role.toLowerCase() === activeMission.bonusRole.toLowerCase()) {
+          charScore += activeMission.bonusAmount;
+        }
+      } else {
+        // Default / Highest Total Team Score / Budget Efficiency base rating
+        charScore = ((power || 0) + (intelligence || 0) + (speed || 0) + (durability || 0) + (combat || 0)) / 5;
+      }
+      
+      teamScore += charScore;
+    }
+  });
+  
+  if (mode === 'EFFICIENCY') {
+    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
+    return totalSpent > 0 ? parseFloat((teamScore / totalSpent).toFixed(2)) : 0;
+  }
+  
+  return Math.round(teamScore);
+}
+
+// Generate unique room code
+function generateRoomCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  
+  // 50% chance of themed code (e.g. MARVEL123), 50% chance of random 6-character code (e.g. A7KQ9P)
+  if (Math.random() < 0.5) {
+    const prefixes = ['MARVEL', 'AVENGER', 'SHIELD', 'HYDRA', 'TITAN'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(100 + Math.random() * 900); // 3 digits
+    code = `${prefix}${num}`;
+  } else {
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+  }
+  
+  if (rooms[code]) {
+    return generateRoomCode();
+  }
+  return code;
+}
+
+// Create a new room state
+function createRoom(partyCode) {
+  const room = {
+    partyCode: partyCode,
+    status: 'LOBBY',
+    players: {},
+    characters: shuffleArray(JSON.parse(JSON.stringify(characters))),
+    currentIndex: -1,
+    currentBid: 0,
+    currentBidder: null,
+    bidHistory: [],
+    chatHistory: [],
+    timer: 0,
+    isPaused: false,
+    timerInterval: null,
+    mode: 'TOTAL_SCORE',
+    activeMission: null
+  };
+  rooms[partyCode] = room;
+  return room;
+}
+
+// Reset room state
+function resetRoomState(room) {
+  stopTimer(room);
+  room.status = 'LOBBY';
+  room.currentIndex = -1;
+  room.currentBid = 0;
+  room.currentBidder = null;
+  room.bidHistory = [];
+  room.isPaused = false;
+  room.timer = 0;
+  room.characters = shuffleArray(JSON.parse(JSON.stringify(characters)));
   
   // Reset player budgets and squads, keep names/avatars/hosts
-  Object.keys(gameState.players).forEach(id => {
-    gameState.players[id].budget = DEFAULT_BUDGET;
-    gameState.players[id].squad = [];
+  Object.keys(room.players).forEach(id => {
+    room.players[id].budget = DEFAULT_BUDGET;
+    room.players[id].squad = [];
   });
 }
 
-resetGameState();
+// Clean room state for client (remove Timeout object)
+function cleanRoomStateForClient(room) {
+  return {
+    partyCode: room.partyCode,
+    status: room.status,
+    players: room.players,
+    characters: room.characters,
+    currentIndex: room.currentIndex,
+    currentBid: room.currentBid,
+    currentBidder: room.currentBidder,
+    bidHistory: room.bidHistory,
+    chatHistory: room.chatHistory,
+    timer: room.timer,
+    isPaused: room.isPaused,
+    mode: room.mode || 'TOTAL_SCORE',
+    activeMission: room.activeMission || null
+  };
+}
 
-function startTimer() {
-  stopTimer();
-  gameState.timer = COUNTDOWN_SECONDS;
-  gameState.isPaused = false;
+function startTimer(room) {
+  stopTimer(room);
+  room.timer = COUNTDOWN_SECONDS;
+  room.isPaused = false;
   
-  timerInterval = setInterval(() => {
-    if (!gameState.isPaused && gameState.status === 'AUCTION') {
-      gameState.timer--;
+  room.timerInterval = setInterval(() => {
+    if (!room.isPaused && room.status === 'AUCTION') {
+      room.timer--;
       
-      if (gameState.timer <= 0) {
-        processSale();
+      if (room.timer <= 0) {
+        processSale(room);
       } else {
-        io.emit('timer-update', { timer: gameState.timer });
+        io.to(room.partyCode).emit('timer-update', { timer: room.timer });
       }
     }
   }, 1000);
   
-  io.emit('timer-update', { timer: gameState.timer });
+  io.to(room.partyCode).emit('timer-update', { timer: room.timer });
 }
 
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+function stopTimer(room) {
+  if (room.timerInterval) {
+    clearInterval(room.timerInterval);
+    room.timerInterval = null;
   }
 }
 
-function processSale() {
-  stopTimer();
+function processSale(room) {
+  stopTimer(room);
   
-  const character = gameState.characters[gameState.currentIndex];
-  const bidderId = gameState.currentBidder;
+  const character = room.characters[room.currentIndex];
+  const bidderId = room.currentBidder;
   
-  if (bidderId && gameState.players[bidderId]) {
-    const buyer = gameState.players[bidderId];
+  if (bidderId && room.players[bidderId]) {
+    const buyer = room.players[bidderId];
     
     // Process payment
-    buyer.budget -= gameState.currentBid;
+    buyer.budget -= room.currentBid;
     buyer.squad.push({
       id: character.id,
       name: character.name,
       role: character.role,
-      price: gameState.currentBid,
+      price: room.currentBid,
       emoji: character.emoji,
-      gradient: character.gradient
+      gradient: character.gradient,
+      stats: character.stats // Store stats for Team Rating calculation
     });
     
-    gameState.status = 'SOLD';
+    room.status = 'SOLD';
     
-    addSystemMessage(`${character.name} SOLD to ${buyer.name} for $${gameState.currentBid}M! 🏆`);
-    io.emit('celebration', {
+    addSystemMessage(room, `${character.name} SOLD to ${buyer.name} for $${room.currentBid}M! 🏆`);
+    io.to(room.partyCode).emit('celebration', {
       type: 'sold',
       characterName: character.name,
       buyerName: buyer.name,
-      price: gameState.currentBid,
+      price: room.currentBid,
       gradient: character.gradient,
       emoji: character.emoji
     });
   } else {
     // Went unsold
-    gameState.status = 'SOLD';
-    addSystemMessage(`${character.name} went UNSOLD! 💨`);
-    io.emit('celebration', {
+    room.status = 'SOLD';
+    addSystemMessage(room, `${character.name} went UNSOLD! 💨`);
+    io.to(room.partyCode).emit('celebration', {
       type: 'unsold',
       characterName: character.name
     });
   }
   
   // Set automated countdown for next character reveal (5 seconds)
-  gameState.timer = 5;
-  timerInterval = setInterval(() => {
-    if (!gameState.isPaused && gameState.status === 'SOLD') {
-      gameState.timer--;
+  room.timer = 5;
+  room.timerInterval = setInterval(() => {
+    if (!room.isPaused && room.status === 'SOLD') {
+      room.timer--;
       
-      if (gameState.timer <= 0) {
-        stopTimer();
-        selectNextCharacter();
+      if (room.timer <= 0) {
+        stopTimer(room);
+        selectNextCharacter(room);
       } else {
-        io.emit('timer-update', { timer: gameState.timer });
+        io.to(room.partyCode).emit('timer-update', { timer: room.timer });
       }
     }
   }, 1000);
   
-  io.emit('timer-update', { timer: gameState.timer });
-  io.emit('state-update', gameState);
+  io.to(room.partyCode).emit('timer-update', { timer: room.timer });
+  io.to(room.partyCode).emit('state-update', cleanRoomStateForClient(room));
 }
 
-function addSystemMessage(text) {
+function addSystemMessage(room, text) {
   const msg = {
     name: "System",
     message: text,
@@ -176,46 +377,90 @@ function addSystemMessage(text) {
     color: "#e50914",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   };
-  gameState.chatHistory.push(msg);
-  if (gameState.chatHistory.length > 50) gameState.chatHistory.shift();
-  io.emit('chat-message', msg);
+  room.chatHistory.push(msg);
+  if (room.chatHistory.length > 50) room.chatHistory.shift();
+  io.to(room.partyCode).emit('chat-message', msg);
 }
 
-function selectNextCharacter() {
-  gameState.currentIndex++;
-  if (gameState.currentIndex >= gameState.characters.length) {
-    // End of game
-    gameState.status = 'FINISHED';
-    addSystemMessage("The Marvel Auction has officially ended! Check out the squads! 🏁");
-    
-    // Find winner (highest value squad or most members)
-    let winner = null;
-    let maxSquadValue = -1;
-    Object.values(gameState.players).forEach(p => {
-      const value = p.squad.reduce((sum, item) => sum + item.price, 0);
-      if (value > maxSquadValue) {
-        maxSquadValue = value;
-        winner = p.name;
-      }
-    });
-    
-    io.emit('celebration', {
-      type: 'end',
-      winnerName: winner || 'No one',
-      totalSpent: maxSquadValue
-    });
-  } else {
-    // Setup character for auction
-    const character = gameState.characters[gameState.currentIndex];
-    gameState.status = 'AUCTION';
-    gameState.currentBid = character.basePrice;
-    gameState.currentBidder = null;
-    gameState.bidHistory = [];
-    
-    addSystemMessage(`Next up: ${character.emoji} ${character.name} (Base Price: $${character.basePrice}M)`);
-    startTimer();
+function calculateTeamRating(squad, mode, activeMission) {
+  return calculateScore(squad, mode, activeMission);
+}
+
+function endAuction(room) {
+  stopTimer(room);
+  room.status = 'FINISHED';
+  addSystemMessage(room, "The Marvel Auction has officially ended! Check out the squads! 🏁");
+  
+  // Find winner (highest Current Team Rating)
+  let winner = null;
+  let maxRating = -1;
+  Object.values(room.players).forEach(p => {
+    const rating = calculateTeamRating(p.squad, room.mode, room.activeMission);
+    if (rating > maxRating && p.squad.length > 0) {
+      maxRating = rating;
+      winner = p;
+    }
+  });
+  
+  io.to(room.partyCode).emit('celebration', {
+    type: 'end',
+    winnerName: winner ? winner.name : 'No one',
+    totalSpent: maxRating
+  });
+  io.to(room.partyCode).emit('state-update', cleanRoomStateForClient(room));
+}
+
+function checkAuctionEndConditions(room) {
+  if (room.status === 'FINISHED' || room.status === 'LOBBY') return false;
+  
+  // Condition 1: All superheroes sold / drafted
+  if (room.currentIndex >= room.characters.length) {
+    endAuction(room);
+    return true;
   }
-  io.emit('state-update', gameState);
+  
+  // Get remaining unsold heroes (including current if status is AUCTION)
+  const startIndex = room.status === 'AUCTION' ? room.currentIndex : room.currentIndex + 1;
+  const remainingHeroes = room.characters.slice(startIndex);
+  if (remainingHeroes.length === 0) {
+    endAuction(room);
+    return true;
+  }
+  
+  const lowestBasePrice = Math.min(...remainingHeroes.map(h => h.basePrice));
+  
+  // Condition 2: Every active player in the room is Out of Credits (budget < lowest base price)
+  const players = Object.values(room.players);
+  if (players.length > 0) {
+    const allOut = players.every(p => p.budget < lowestBasePrice);
+    if (allOut) {
+      console.log(`Ending room ${room.partyCode} immediately: all active players are Out of Credits.`);
+      addSystemMessage(room, "🚫 Every player is Out of Credits! End auction immediately.");
+      endAuction(room);
+      return true;
+    }
+  }
+  return false;
+}
+
+function selectNextCharacter(room) {
+  room.currentIndex++;
+  
+  // Check ending conditions immediately
+  if (checkAuctionEndConditions(room)) {
+    return;
+  }
+  
+  // Setup character for auction
+  const character = room.characters[room.currentIndex];
+  room.status = 'AUCTION';
+  room.currentBid = character.basePrice;
+  room.currentBidder = null;
+  room.bidHistory = [];
+  
+  addSystemMessage(room, `Next up: ${character.emoji} ${character.name} (Base Price: $${character.basePrice}M)`);
+  startTimer(room);
+  io.to(room.partyCode).emit('state-update', cleanRoomStateForClient(room));
 }
 
 // Generate nice pastel colors for user names
@@ -229,15 +474,38 @@ io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
   
   // Initial join lobby handler
-  socket.on('join', ({ name, avatar }) => {
+  socket.on('join', ({ action, roomCode, name, avatar }) => {
     if (!name || name.trim() === '') name = `Player-${socket.id.substring(0, 4)}`;
+    name = name.trim().substring(0, 16);
     
-    // If first player, make them Host
-    const isFirstPlayer = Object.keys(gameState.players).length === 0;
+    let room;
+    let code;
     
-    gameState.players[socket.id] = {
+    if (action === 'create') {
+      code = generateRoomCode();
+      room = createRoom(code);
+    } else if (action === 'join') {
+      if (!roomCode) {
+        socket.emit('error-msg', 'Please enter a party code.');
+        return;
+      }
+      code = roomCode.trim().toUpperCase();
+      room = rooms[code];
+      if (!room) {
+        socket.emit('error-msg', `Party code ${code} not found.`);
+        return;
+      }
+    } else {
+      socket.emit('error-msg', 'Invalid join action.');
+      return;
+    }
+    
+    // If first player in this room, make them Host
+    const isFirstPlayer = Object.keys(room.players).length === 0;
+    
+    room.players[socket.id] = {
       id: socket.id,
-      name: name.trim().substring(0, 16),
+      name: name,
       budget: DEFAULT_BUDGET,
       squad: [],
       avatar: avatar || '🦸',
@@ -245,32 +513,48 @@ io.on('connection', (socket) => {
       color: colors[Math.floor(Math.random() * colors.length)]
     };
     
-    console.log(`Player joined: ${name} (Host: ${isFirstPlayer})`);
+    socket.roomCode = code;
+    socket.join(code);
+    
+    console.log(`Player joined room ${code}: ${name} (Host: ${isFirstPlayer})`);
     
     // Welcome message
     socket.emit('joined-lobby', { 
+      roomCode: code,
       playerId: socket.id, 
       isHost: isFirstPlayer 
     });
     
-    addSystemMessage(`${name} has entered the auction lobby! 👋`);
+    addSystemMessage(room, `${name} has entered the auction lobby! 👋`);
     
     // Sync current state
-    io.emit('state-update', gameState);
+    io.to(code).emit('state-update', cleanRoomStateForClient(room));
   });
   
   // Bid placing logic
   socket.on('place-bid', ({ amount }) => {
-    const player = gameState.players[socket.id];
+    const roomCode = socket.roomCode;
+    if (!roomCode || !rooms[roomCode]) return;
+    const room = rooms[roomCode];
+    
+    const player = room.players[socket.id];
     if (!player) return;
     
-    if (gameState.status !== 'AUCTION') {
+    if (room.status !== 'AUCTION') {
       socket.emit('error-msg', 'Auction is not active right now.');
       return;
     }
     
-    if (gameState.isPaused) {
+    if (room.isPaused) {
       socket.emit('error-msg', 'Auction is currently paused.');
+      return;
+    }
+    
+    // Check if player is Out of Credits (spectator)
+    const remainingHeroes = room.characters.slice(room.currentIndex);
+    const lowestBasePrice = remainingHeroes.length > 0 ? Math.min(...remainingHeroes.map(h => h.basePrice)) : 9999;
+    if (player.budget < lowestBasePrice) {
+      socket.emit('error-msg', 'You don\'t have enough credits to purchase any remaining superhero.');
       return;
     }
     
@@ -282,8 +566,8 @@ io.on('connection', (socket) => {
     
     // Bid must be higher than current bid
     // Exception: First bid can be exactly the base price
-    const isFirstBid = gameState.currentBidder === null;
-    const minBidRequired = isFirstBid ? gameState.currentBid : gameState.currentBid + 1; // min increment $1M
+    const isFirstBid = room.currentBidder === null;
+    const minBidRequired = isFirstBid ? room.currentBid : room.currentBid + 1; // min increment $1M
     
     if (amountNum < minBidRequired) {
       socket.emit('error-msg', `Bid must be at least $${minBidRequired}M!`);
@@ -297,38 +581,42 @@ io.on('connection', (socket) => {
     }
     
     // Update Bid details
-    gameState.currentBid = amountNum;
-    gameState.currentBidder = socket.id;
+    room.currentBid = amountNum;
+    room.currentBidder = socket.id;
     
     const bidEntry = {
       bidderName: player.name,
       bidAmount: amountNum,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     };
-    gameState.bidHistory.push(bidEntry);
-    if (gameState.bidHistory.length > 30) gameState.bidHistory.shift();
+    room.bidHistory.push(bidEntry);
+    if (room.bidHistory.length > 30) room.bidHistory.shift();
     
     // System log
-    addSystemMessage(`💥 ${player.name} raised the bid to $${amountNum}M!`);
+    addSystemMessage(room, `💥 ${player.name} raised the bid to $${amountNum}M!`);
     
     // Reset timer to prevent sniping if less than 8 seconds remain
-    if (gameState.timer < MINI_COUNTDOWN_SECONDS) {
-      gameState.timer = MINI_COUNTDOWN_SECONDS;
-      io.emit('timer-update', { timer: gameState.timer });
-      addSystemMessage(`⏱️ Time extended to ${MINI_COUNTDOWN_SECONDS}s!`);
+    if (room.timer < MINI_COUNTDOWN_SECONDS) {
+      room.timer = MINI_COUNTDOWN_SECONDS;
+      io.to(roomCode).emit('timer-update', { timer: room.timer });
+      addSystemMessage(room, `⏱️ Time extended to ${MINI_COUNTDOWN_SECONDS}s!`);
     }
     
-    io.emit('bid-update', {
-      currentBid: gameState.currentBid,
-      currentBidder: gameState.currentBidder,
-      bidHistory: gameState.bidHistory
+    io.to(roomCode).emit('bid-update', {
+      currentBid: room.currentBid,
+      currentBidder: room.currentBidder,
+      bidHistory: room.bidHistory
     });
-    io.emit('state-update', gameState);
+    io.to(roomCode).emit('state-update', cleanRoomStateForClient(room));
   });
   
   // Real-time Chat
   socket.on('chat-message', (text) => {
-    const player = gameState.players[socket.id];
+    const roomCode = socket.roomCode;
+    if (!roomCode || !rooms[roomCode]) return;
+    const room = rooms[roomCode];
+    
+    const player = room.players[socket.id];
     if (!player) return;
     
     const msg = {
@@ -339,19 +627,23 @@ io.on('connection', (socket) => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
-    gameState.chatHistory.push(msg);
-    if (gameState.chatHistory.length > 50) gameState.chatHistory.shift();
+    room.chatHistory.push(msg);
+    if (room.chatHistory.length > 50) room.chatHistory.shift();
     
-    io.emit('chat-message', msg);
+    io.to(roomCode).emit('chat-message', msg);
   });
   
   // Emoji Reacts
   socket.on('emoji-react', (emoji) => {
-    const player = gameState.players[socket.id];
+    const roomCode = socket.roomCode;
+    if (!roomCode || !rooms[roomCode]) return;
+    const room = rooms[roomCode];
+    
+    const player = room.players[socket.id];
     if (!player) return;
     
     // Broadcast emoji details so others render floating animations
-    io.emit('emoji-burst', {
+    io.to(roomCode).emit('emoji-burst', {
       name: player.name,
       color: player.color,
       emoji: emoji
@@ -359,69 +651,103 @@ io.on('connection', (socket) => {
   });
   
   // Host Controls
-  socket.on('host-action', (action) => {
-    const player = gameState.players[socket.id];
+  socket.on('host-action', (actionData) => {
+    const roomCode = socket.roomCode;
+    if (!roomCode || !rooms[roomCode]) return;
+    const room = rooms[roomCode];
+    
+    const player = room.players[socket.id];
     if (!player || !player.isHost) {
       socket.emit('error-msg', 'Only the host can perform this action.');
       return;
     }
     
-    console.log(`Host Action: ${action}`);
+    console.log(`Host Action:`, actionData);
+    
+    let action = actionData;
+    let selectedMode = 'TOTAL_SCORE';
+    
+    if (typeof actionData === 'object' && actionData !== null) {
+      action = actionData.action;
+      selectedMode = actionData.mode || 'TOTAL_SCORE';
+    }
     
     if (action === 'start') {
-      if (gameState.status === 'LOBBY') {
-        resetGameState();
-        selectNextCharacter();
+      if (room.status === 'LOBBY') {
+        room.mode = selectedMode;
+        if (selectedMode === 'MISSION') {
+          const randomMission = JSON.parse(JSON.stringify(MISSION_POOL[Math.floor(Math.random() * MISSION_POOL.length)]));
+          if (randomMission.name === "Multiverse Chaos") {
+            randomMission.weights = generateRandomWeights();
+          }
+          room.activeMission = randomMission;
+          addSystemMessage(room, `🎲 Selected Mission: ${randomMission.name}!`);
+        } else {
+          room.activeMission = null;
+        }
+        
+        resetRoomState(room);
+        selectNextCharacter(room);
       }
     } else if (action === 'next') {
-      if (gameState.status === 'SOLD' || gameState.status === 'LOBBY') {
-        selectNextCharacter();
+      if (room.status === 'SOLD' || room.status === 'LOBBY') {
+        selectNextCharacter(room);
       }
     } else if (action === 'pause') {
-      if (gameState.status === 'AUCTION') {
-        gameState.isPaused = !gameState.isPaused;
-        addSystemMessage(gameState.isPaused ? "⏸️ The auction has been PAUSED by the host." : "▶️ The auction has been RESUMED by the host.");
-        io.emit('state-update', gameState);
+      if (room.status === 'AUCTION') {
+        room.isPaused = !room.isPaused;
+        addSystemMessage(room, room.isPaused ? "⏸️ The auction has been PAUSED by the host." : "▶️ The auction has been RESUMED by the host.");
+        io.to(roomCode).emit('state-update', cleanRoomStateForClient(room));
       }
     } else if (action === 'sell') {
-      if (gameState.status === 'AUCTION') {
-        addSystemMessage("⚡ Host forced an instant sale!");
-        processSale();
+      if (room.status === 'AUCTION') {
+        addSystemMessage(room, "⚡ Host forced an instant sale!");
+        processSale(room);
       }
     } else if (action === 'reset') {
-      resetGameState();
-      addSystemMessage("🔄 Game reset to Lobby by the host.");
-      io.emit('state-update', gameState);
+      resetRoomState(room);
+      addSystemMessage(room, "🔄 Game reset to Lobby by the host.");
+      io.to(roomCode).emit('state-update', cleanRoomStateForClient(room));
     }
   });
   
   // Disconnect handler
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
-    const player = gameState.players[socket.id];
+    const roomCode = socket.roomCode;
+    if (!roomCode || !rooms[roomCode]) return;
+    const room = rooms[roomCode];
+    
+    const player = room.players[socket.id];
     
     if (player) {
       const wasHost = player.isHost;
-      delete gameState.players[socket.id];
+      delete room.players[socket.id];
       
-      addSystemMessage(`${player.name} has left the auction. 🔌`);
+      addSystemMessage(room, `${player.name} has left the auction. 🔌`);
       
       // If host left, delegate host to another player
-      if (wasHost && Object.keys(gameState.players).length > 0) {
-        const firstRemainingId = Object.keys(gameState.players)[0];
-        gameState.players[firstRemainingId].isHost = true;
+      if (wasHost && Object.keys(room.players).length > 0) {
+        const firstRemainingId = Object.keys(room.players)[0];
+        room.players[firstRemainingId].isHost = true;
         io.to(firstRemainingId).emit('joined-lobby', { 
+          roomCode: roomCode,
           playerId: firstRemainingId, 
           isHost: true 
         });
-        addSystemMessage(`${gameState.players[firstRemainingId].name} is now the host! 👑`);
+        addSystemMessage(room, `${room.players[firstRemainingId].name} is now the host! 👑`);
       }
       
-      // If no players are left, reset the game
-      if (Object.keys(gameState.players).length === 0) {
-        resetGameState();
+      // If no players are left, clear intervals and clean up room state
+      if (Object.keys(room.players).length === 0) {
+        stopTimer(room);
+        delete rooms[roomCode];
+        console.log(`Deleted empty room ${roomCode}`);
       } else {
-        io.emit('state-update', gameState);
+        // Check ending conditions immediately in case the disconnect ends the auction
+        if (!checkAuctionEndConditions(room)) {
+          io.to(roomCode).emit('state-update', cleanRoomStateForClient(room));
+        }
       }
     }
   });

@@ -36,7 +36,7 @@
         
         <p class="lobby-desc">Enter your superhero alias and select an avatar to join the live auction room.</p>
         
-        <form id="lobby-form" onsubmit="event.preventDefault(); joinGame();">
+        <form id="lobby-form" onsubmit="event.preventDefault();">
           <div class="form-group">
             <label for="player-name">YOUR ALIAS</label>
             <input type="text" id="player-name" maxlength="16" placeholder="e.g. TonyStark" required autocomplete="off">
@@ -58,9 +58,22 @@
             </div>
           </div>
           
-          <button type="submit" class="btn btn-primary btn-glow btn-large">
-            <span>ENTER AUCTION LOBBY</span>
-          </button>
+          <div class="party-options">
+            <button type="button" onclick="createParty()" class="btn btn-primary btn-glow btn-large" style="margin-bottom: 20px;">
+              <i class="fa-solid fa-plus-circle"></i> CREATE NEW PARTY
+            </button>
+            
+            <div class="party-separator">
+              <span>OR JOIN AN EXISTING PARTY</span>
+            </div>
+            
+            <div class="join-party-row">
+              <input type="text" id="party-code-input" maxlength="12" placeholder="ENTER PARTY CODE" autocomplete="off">
+              <button type="button" onclick="joinParty()" class="btn btn-accent btn-glow">
+                JOIN
+              </button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -76,6 +89,12 @@
         </div>
         
         <div class="header-right">
+          <div class="party-code-badge" onclick="copyPartyCode()" title="Click to copy party code">
+            <i class="fa-solid fa-key"></i>
+            <span id="party-code-val">------</span>
+            <i class="fa-solid fa-copy copy-icon"></i>
+          </div>
+
           <div class="lobby-count-badge">
             <i class="fa-solid fa-users"></i>
             <span id="player-count">0</span> Players
@@ -97,13 +116,37 @@
         <!-- Column Left: Character / Bid Area -->
         <section class="left-section">
           
+          <!-- Mode/Rules Board -->
+          <div id="rules-board" class="rules-board glass-panel hidden">
+            <div class="board-header">
+              <span class="mode-badge" id="board-mode-type">MISSION</span>
+              <h3 class="mission-title" id="board-mission-name">🛡️ Defend Wakanda</h3>
+            </div>
+            <div class="board-body">
+              <div class="weights-list" id="board-mission-weights">
+                <!-- tags -->
+              </div>
+              <div id="board-mission-bonus">
+                <!-- tag -->
+              </div>
+            </div>
+          </div>
+          
           <!-- State Panel: Waiting for Start -->
           <div id="state-waiting" class="status-panel glass-panel active">
             <div class="pulse-icon"><i class="fa-solid fa-hourglass-half"></i></div>
             <h2>WAITING FOR GAME TO START</h2>
             <p id="waiting-status-msg">Waiting for the host to initiate the draft...</p>
             <div id="host-start-zone" class="host-only-controls hidden">
-              <button onclick="sendHostAction('start')" class="btn btn-accent btn-glow">
+              <div class="mode-select-group">
+                <label for="game-mode-select">SELECT GAME MODE</label>
+                <select id="game-mode-select">
+                  <option value="TOTAL_SCORE">Highest Total Team Score</option>
+                  <option value="EFFICIENCY">Budget Efficiency</option>
+                  <option value="MISSION">Random Mission System</option>
+                </select>
+              </div>
+              <button onclick="startGameWithMode()" class="btn btn-accent btn-glow">
                 <i class="fa-solid fa-play"></i> START DRAFT CHAMPIONSHIP
               </button>
             </div>
@@ -175,7 +218,7 @@
               </div>
 
               <!-- Quick Bid Buttons -->
-              <div class="bid-action-buttons">
+              <div class="bid-action-buttons" id="bid-buttons-container">
                 <button onclick="placeBidOffset(1)" class="btn btn-bid">
                   <span class="btn-sub">+ $1M</span>
                   <span id="btn-bid-val-1">Bid $11M</span>
@@ -192,6 +235,14 @@
               
               <div class="bid-feedback-message" id="bid-status-tip">
                 You are currently holding the high bid! 👑
+              </div>
+
+              <!-- Out of Credits Message -->
+              <div id="out-of-credits-banner" class="out-of-credits-banner hidden">
+                <div class="ooc-icon">🚫</div>
+                <h3>Out of Credits</h3>
+                <p>You don't have enough credits to purchase any remaining superhero.</p>
+                <span class="ooc-sub">Please wait for the auction to finish.</span>
               </div>
             </div>
 
