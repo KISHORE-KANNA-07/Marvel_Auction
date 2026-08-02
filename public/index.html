@@ -141,9 +141,9 @@
               <div class="mode-select-group">
                 <label for="game-mode-select">SELECT GAME MODE</label>
                 <select id="game-mode-select">
-                  <option value="TOTAL_SCORE">Highest Total Team Score</option>
+                  <option value="MISSION" selected>Random Mission System</option>
                   <option value="EFFICIENCY">Budget Efficiency</option>
-                  <option value="MISSION">Random Mission System</option>
+                  <option value="TOTAL_SCORE">Highest Total Team Score</option>
                 </select>
               </div>
               <button onclick="startGameWithMode()" class="btn btn-accent btn-glow">
@@ -163,8 +163,16 @@
                   <span class="char-emoji-badge" id="char-emoji">🤖</span>
                 </div>
                 
-                <h2 class="char-name" id="char-name">Iron Man</h2>
+                <div class="hero-name-container">
+                  <span class="hero-name-label">Current Hero</span>
+                  <h2 class="char-name" id="char-name">Iron Man</h2>
+                </div>
                 <p class="char-desc" id="char-desc">Genius, billionaire, playboy, philanthropist.</p>
+                
+                <div class="remaining-heroes-container">
+                  <span class="remaining-heroes-label">Remaining Heroes</span>
+                  <span class="remaining-heroes-val" id="remaining-count-val">18/30</span>
+                </div>
                 
                 <!-- Stats Radar/Bars -->
                 <div class="char-stats">
@@ -349,6 +357,26 @@
           <!-- Tab Content 2: Leaderboard & Squads -->
           <div id="tab-content-squads" class="tab-panel glass-panel">
             <div class="squads-container">
+              <h3 class="panel-section-title"><i class="fa-solid fa-chart-simple"></i> LIVE STATISTICS</h3>
+              <div class="live-stats-dashboard">
+                <div class="stat-card">
+                  <span class="stat-card-label">Heroes Sold</span>
+                  <span class="stat-card-value" id="stats-sold">0</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-card-label">Unsold</span>
+                  <span class="stat-card-value" id="stats-unsold">0</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-card-label">Highest Bid</span>
+                  <span class="stat-card-value" id="stats-highest">$0M</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-card-label">Average Bid</span>
+                  <span class="stat-card-value" id="stats-average">$0M</span>
+                </div>
+              </div>
+
               <h3 class="panel-section-title">LEADERBOARD</h3>
               <div class="player-leaderboard-list" id="leaderboard-list">
                 <!-- Players, budget and squad counts -->

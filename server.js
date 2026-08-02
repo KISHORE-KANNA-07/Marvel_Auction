@@ -236,8 +236,12 @@ function createRoom(partyCode) {
     timer: 0,
     isPaused: false,
     timerInterval: null,
-    mode: 'TOTAL_SCORE',
-    activeMission: null
+    mode: 'MISSION',
+    activeMission: null,
+    heroesSold: 0,
+    unsoldCount: 0,
+    highestBid: 0,
+    totalSpent: 0
   };
   rooms[partyCode] = room;
   return room;
@@ -254,6 +258,10 @@ function resetRoomState(room) {
   room.isPaused = false;
   room.timer = 0;
   room.characters = shuffleArray(JSON.parse(JSON.stringify(characters)));
+  room.heroesSold = 0;
+  room.unsoldCount = 0;
+  room.highestBid = 0;
+  room.totalSpent = 0;
   
   // Reset player budgets and squads, keep names/avatars/hosts
   Object.keys(room.players).forEach(id => {
@@ -264,6 +272,7 @@ function resetRoomState(room) {
 
 // Clean room state for client (remove Timeout object)
 function cleanRoomStateForClient(room) {
+  const averageBid = room.heroesSold > 0 ? parseFloat((room.totalSpent / room.heroesSold).toFixed(1)) : 0;
   return {
     partyCode: room.partyCode,
     status: room.status,
@@ -276,8 +285,14 @@ function cleanRoomStateForClient(room) {
     chatHistory: room.chatHistory,
     timer: room.timer,
     isPaused: room.isPaused,
-    mode: room.mode || 'TOTAL_SCORE',
-    activeMission: room.activeMission || null
+    mode: room.mode || 'MISSION',
+    activeMission: room.activeMission || null,
+    stats: {
+      heroesSold: room.heroesSold || 0,
+      unsoldCount: room.unsoldCount || 0,
+      highestBid: room.highestBid || 0,
+      averageBid: averageBid
+    }
   };
 }
 
@@ -329,6 +344,13 @@ function processSale(room) {
       stats: character.stats // Store stats for Team Rating calculation
     });
     
+    // Update live statistics
+    room.heroesSold++;
+    room.totalSpent += room.currentBid;
+    if (room.currentBid > room.highestBid) {
+      room.highestBid = room.currentBid;
+    }
+    
     room.status = 'SOLD';
     
     addSystemMessage(room, `${character.name} SOLD to ${buyer.name} for $${room.currentBid}M! 🏆`);
@@ -343,6 +365,8 @@ function processSale(room) {
   } else {
     // Went unsold
     room.status = 'SOLD';
+    room.unsoldCount++;
+    
     addSystemMessage(room, `${character.name} went UNSOLD! 💨`);
     io.to(room.partyCode).emit('celebration', {
       type: 'unsold',
@@ -665,11 +689,11 @@ io.on('connection', (socket) => {
     console.log(`Host Action:`, actionData);
     
     let action = actionData;
-    let selectedMode = 'TOTAL_SCORE';
+    let selectedMode = 'MISSION';
     
     if (typeof actionData === 'object' && actionData !== null) {
       action = actionData.action;
-      selectedMode = actionData.mode || 'TOTAL_SCORE';
+      selectedMode = actionData.mode || 'MISSION';
     }
     
     if (action === 'start') {

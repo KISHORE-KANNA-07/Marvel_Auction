@@ -581,6 +581,49 @@ body {
   min-height: 40px;
 }
 
+.hero-name-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px;
+}
+
+.hero-name-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.remaining-heroes-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+
+.remaining-heroes-label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.remaining-heroes-val {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--cosmic-gold);
+  text-shadow: 0 0 8px var(--cosmic-gold-glow);
+}
+
 /* Stat bars style */
 .char-stats {
   display: flex;
@@ -1120,6 +1163,64 @@ body {
   color: var(--arc-cyan);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
   padding-bottom: 8px;
+}
+
+/* Live Statistics Dashboard Grid */
+.live-stats-dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.stat-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+  border-color: rgba(0, 242, 254, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.stat-card-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+/* Highlight specific stats */
+.stat-card:nth-child(1) .stat-card-value {
+  color: #4ade80; /* Sold: Green */
+}
+.stat-card:nth-child(2) .stat-card-value {
+  color: var(--danger-pink); /* Unsold: Pink */
+}
+.stat-card:nth-child(3) .stat-card-value {
+  color: var(--cosmic-gold); /* Highest: Gold */
+}
+.stat-card:nth-child(4) .stat-card-value {
+  color: var(--arc-cyan); /* Average: Cyan */
 }
 
 /* Leaderboard player list */

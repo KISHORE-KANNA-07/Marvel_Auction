@@ -213,6 +213,7 @@ socket.on('state-update', (state) => {
   renderSoldState(state);
   renderFinishedState(state);
   renderLeaderboardAndSquads(state);
+  renderLiveStats(state);
 });
 
 // Update Header details
@@ -252,6 +253,18 @@ function renderHeader(state) {
       hostBar.classList.add('hidden');
     }
   }
+}
+
+// Render LIVE STATISTICS Dashboard
+function renderLiveStats(state) {
+  const stats = state.stats || { heroesSold: 0, unsoldCount: 0, highestBid: 0, averageBid: 0 };
+  
+  document.getElementById('stats-sold').textContent = stats.heroesSold;
+  document.getElementById('stats-unsold').textContent = stats.unsoldCount;
+  
+  // Format Highest Bid and Average Bid. If 0, show $0M, otherwise format properly
+  document.getElementById('stats-highest').textContent = stats.highestBid > 0 ? `$${stats.highestBid}M` : '$0M';
+  document.getElementById('stats-average').textContent = stats.averageBid > 0 ? `$${stats.averageBid}M` : '$0M';
 }
 
 // Render LOBBY WAIT state panel
@@ -343,6 +356,11 @@ function renderActiveAuction(state) {
     document.getElementById('char-emoji').textContent = character.emoji;
     document.getElementById('char-name').textContent = character.name;
     document.getElementById('char-desc').textContent = character.description;
+    
+    // Remaining count
+    const remainingCount = state.characters.length - state.currentIndex;
+    const totalCount = state.characters.length;
+    document.getElementById('remaining-count-val').textContent = `${remainingCount}/${totalCount}`;
     
     // Render Stats
     document.getElementById('stat-pwr').style.width = `${character.stats.power}%`;
@@ -618,7 +636,7 @@ function sendHostAction(action) {
 
 function startGameWithMode() {
   const select = document.getElementById('game-mode-select');
-  const mode = select ? select.value : 'TOTAL_SCORE';
+  const mode = select ? select.value : 'MISSION';
   socket.emit('host-action', { action: 'start', mode: mode });
 }
 
