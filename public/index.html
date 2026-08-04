@@ -113,6 +113,19 @@
       <!-- Main Game Grid -->
       <main class="game-grid">
 
+        <!-- Mobile Navigation Tabs -->
+        <div class="tab-selectors">
+          <button id="tab-btn-auction" class="tab-btn active" onclick="switchTab('auction')">
+            <i class="fa-solid fa-gavel"></i> AUCTION
+          </button>
+          <button id="tab-btn-chat" class="tab-btn" onclick="switchTab('chat')">
+            <i class="fa-solid fa-comments"></i> CHAT & BIDS
+          </button>
+          <button id="tab-btn-squads" class="tab-btn" onclick="switchTab('squads')">
+            <i class="fa-solid fa-shield-halved"></i> LEADERBOARD
+          </button>
+        </div>
+
         <!-- Column Left: Character / Bid Area -->
         <section class="left-section">
           
@@ -316,16 +329,6 @@
 
         <!-- Column Right: Chat, Emojis & Leaderboard -->
         <section class="right-section">
-          
-          <!-- Mobile Drawer Tabs (Toggle between Chat/Bids and Leaderboards/Squads) -->
-          <div class="tab-selectors">
-            <button id="tab-btn-chat" class="tab-btn active" onclick="switchTab('chat')">
-              <i class="fa-solid fa-comments"></i> CHAT & BIDS
-            </button>
-            <button id="tab-btn-squads" class="tab-btn" onclick="switchTab('squads')">
-              <i class="fa-solid fa-shield-halved"></i> LEADERBOARD / SQUADS
-            </button>
-          </div>
 
           <!-- Tab Content 1: Chat and Reactions -->
           <div id="tab-content-chat" class="tab-panel active glass-panel">

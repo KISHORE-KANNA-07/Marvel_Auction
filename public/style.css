@@ -1445,12 +1445,16 @@ body {
   .right-section {
     position: sticky;
     top: 15px;
+    display: flex !important;
+  }
+  .left-section {
+    display: flex !important;
   }
   .tab-panel {
     display: flex !important;
   }
   .tab-panel:first-child {
-    height: 380px; /* Fixed height (approximately 300-400px) on desktop */
+    height: 380px; /* Fixed height on desktop */
     margin-bottom: 20px;
     flex: none;
   }
@@ -1468,25 +1472,77 @@ body {
   /* Mobile and Tablet optimization */
   .game-grid {
     grid-template-columns: 1fr;
-    padding-bottom: 80px; /* offset for tab triggers */
+    padding-bottom: 20px;
+  }
+  
+  .left-section {
+    display: flex; /* default visibility on mobile, toggled via JS */
   }
   
   .right-section {
-    height: 480px; /* Restrict height to prevent the page from growing excessively */
+    display: none; /* hidden until toggled by tab selector on mobile */
+    height: calc(100vh - 180px); /* fills available viewport height */
     margin-bottom: 20px;
   }
   
   .tab-panel {
     height: 100%;
+    display: none;
+  }
+  
+  .tab-panel.active {
+    display: flex;
   }
   
   .tab-selectors {
+    display: flex !important;
+    grid-column: 1 / -1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 4px;
+    margin: 10px 15px;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 12px 6px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .tab-btn.active {
+    background: rgba(0, 242, 254, 0.1);
+    color: var(--arc-cyan);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
   }
   
   .app-header {
     padding: 10px 15px;
     margin: 10px;
+  }
+  
+  .header-right {
+    gap: 10px;
+  }
+  
+  .party-code-badge, .lobby-count-badge, .user-profile-badge {
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
   
   .marvel-title {
@@ -1498,18 +1554,135 @@ body {
     letter-spacing: 4px;
   }
   
-  /* Bids button size optimization */
-  .bid-action-buttons {
+  .app-footer {
+    display: none !important; /* Hide footer on mobile/tablet to save vertical space */
+  }
+}
+
+@media (max-width: 600px) {
+  /* Phone optimization */
+  .app-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    margin: 8px;
+  }
+  
+  .header-logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-around;
     gap: 8px;
   }
   
+  .user-info .user-name {
+    display: none; /* Hide name to save space, keep avatar and budget */
+  }
+  
+  .user-profile-badge {
+    padding: 4px 10px;
+  }
+  
+  .party-code-badge, .lobby-count-badge {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small screens / compact view */
+  .lobby-card {
+    padding: 25px 15px;
+  }
+  
+  .marvel-title {
+    font-size: 2.5rem;
+  }
+  
+  .auction-subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+  }
+  
+  .avatar-grid {
+    gap: 8px;
+  }
+  
+  .avatar-option {
+    font-size: 1.5rem;
+  }
+  
+  .character-card {
+    padding: 16px;
+    gap: 10px;
+  }
+  
+  .char-name {
+    font-size: 1.8rem;
+  }
+  
+  .char-desc {
+    font-size: 0.85rem;
+    min-height: auto;
+  }
+  
+  .char-stats {
+    padding: 10px;
+  }
+  
+  .bid-controls-panel {
+    padding: 16px;
+  }
+  
+  .price-val {
+    font-size: 1.8rem;
+  }
+  
+  .timer-box {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .timer-num {
+    font-size: 1.15rem;
+  }
+  
+  .bid-action-buttons {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
   .btn-bid {
-    height: 60px;
+    height: 55px;
     padding: 8px 4px;
   }
   
   .btn-bid span:not(.btn-sub) {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+  }
+  
+  .winner-highlight {
+    padding: 15px 20px;
+  }
+  
+  #end-winner-name {
+    font-size: 1.8rem;
+  }
+  
+  .host-bar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .host-buttons {
+    width: 100%;
+    justify-content: center;
   }
 }
 

@@ -185,6 +185,11 @@ socket.on('joined-lobby', (data) => {
   // Transition screens
   document.getElementById('lobby-screen').classList.remove('active');
   document.getElementById('game-screen').classList.add('active');
+  
+  // Initialize default tab on mobile
+  if (window.innerWidth < 900) {
+    switchTab('auction');
+  }
 });
 
 // Copy party code helper
@@ -690,23 +695,88 @@ function renderRulesBoard(state) {
 
 // Client Tab toggling on mobile view
 function switchTab(tab) {
+  const auctionBtn = document.getElementById('tab-btn-auction');
   const chatBtn = document.getElementById('tab-btn-chat');
   const squadsBtn = document.getElementById('tab-btn-squads');
+  
+  const leftSection = document.querySelector('.left-section');
+  const rightSection = document.querySelector('.right-section');
+  
   const chatPanel = document.getElementById('tab-content-chat');
   const squadsPanel = document.getElementById('tab-content-squads');
   
-  if (tab === 'chat') {
-    chatBtn.classList.add('active');
-    squadsBtn.classList.remove('active');
-    chatPanel.classList.add('active');
-    squadsPanel.classList.remove('active');
+  const isMobile = window.innerWidth < 900;
+  
+  if (isMobile) {
+    // Remove active class from all buttons
+    if (auctionBtn) auctionBtn.classList.remove('active');
+    if (chatBtn) chatBtn.classList.remove('active');
+    if (squadsBtn) squadsBtn.classList.remove('active');
+    
+    if (tab === 'auction') {
+      if (auctionBtn) auctionBtn.classList.add('active');
+      if (leftSection) leftSection.style.display = 'flex';
+      if (rightSection) rightSection.style.display = 'none';
+    } 
+    else if (tab === 'chat') {
+      if (chatBtn) chatBtn.classList.add('active');
+      if (leftSection) leftSection.style.display = 'none';
+      if (rightSection) rightSection.style.display = 'flex';
+      if (chatPanel) chatPanel.classList.add('active');
+      if (squadsPanel) squadsPanel.classList.remove('active');
+    } 
+    else if (tab === 'squads') {
+      if (squadsBtn) squadsBtn.classList.add('active');
+      if (leftSection) leftSection.style.display = 'none';
+      if (rightSection) rightSection.style.display = 'flex';
+      if (chatPanel) chatPanel.classList.remove('active');
+      if (squadsPanel) squadsPanel.classList.add('active');
+    }
   } else {
-    chatBtn.classList.remove('active');
-    squadsBtn.classList.add('active');
-    chatPanel.classList.remove('active');
-    squadsPanel.classList.add('active');
+    // Desktop layout styling cleanup
+    if (leftSection) leftSection.style.display = '';
+    if (rightSection) rightSection.style.display = '';
+    if (chatPanel) chatPanel.classList.add('active');
+    if (squadsPanel) squadsPanel.classList.add('active');
+    
+    if (auctionBtn) auctionBtn.classList.remove('active');
+    if (chatBtn) chatBtn.classList.remove('active');
+    if (squadsBtn) squadsBtn.classList.remove('active');
   }
 }
+
+// Window resize listener to handle transitioning between desktop and mobile views
+window.addEventListener('resize', () => {
+  const isMobile = window.innerWidth < 900;
+  const leftSection = document.querySelector('.left-section');
+  const rightSection = document.querySelector('.right-section');
+  const chatPanel = document.getElementById('tab-content-chat');
+  const squadsPanel = document.getElementById('tab-content-squads');
+  
+  if (!isMobile) {
+    if (leftSection) leftSection.style.display = '';
+    if (rightSection) rightSection.style.display = '';
+    if (chatPanel) chatPanel.classList.add('active');
+    if (squadsPanel) squadsPanel.classList.add('active');
+    
+    const auctionBtn = document.getElementById('tab-btn-auction');
+    const chatBtn = document.getElementById('tab-btn-chat');
+    const squadsBtn = document.getElementById('tab-btn-squads');
+    if (auctionBtn) auctionBtn.classList.remove('active');
+    if (chatBtn) chatBtn.classList.remove('active');
+    if (squadsBtn) squadsBtn.classList.remove('active');
+  } else {
+    // On transition to mobile, activate the active tab
+    const activeTab = document.querySelector('.tab-selectors .tab-btn.active');
+    if (activeTab) {
+      if (activeTab.id === 'tab-btn-auction') switchTab('auction');
+      else if (activeTab.id === 'tab-btn-chat') switchTab('chat');
+      else if (activeTab.id === 'tab-btn-squads') switchTab('squads');
+    } else {
+      switchTab('auction');
+    }
+  }
+});
 
 // Chat system
 function sendChatMessage() {
