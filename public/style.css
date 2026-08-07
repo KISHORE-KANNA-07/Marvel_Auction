@@ -2111,15 +2111,22 @@ body {
 /* Footer Styling */
 .app-footer {
   text-align: center;
-  padding: 20px;
+  padding: 16px 20px;
   font-family: var(--font-display);
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
-  margin-top: 30px;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  text-transform: none;
 }
 .app-footer p {
   margin: 0;
+}
+.app-footer strong {
+  color: var(--arc-cyan);
+  font-weight: 800;
+  text-shadow: 0 0 8px var(--arc-cyan-glow);
 }
