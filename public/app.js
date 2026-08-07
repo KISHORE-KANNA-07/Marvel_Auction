@@ -232,7 +232,8 @@ function renderHeader(state) {
   if (myPlayerInfo) {
     document.getElementById('my-avatar').textContent = myPlayerInfo.avatar;
     document.getElementById('my-name').textContent = myPlayerInfo.name;
-    document.getElementById('my-budget').textContent = `$${myPlayerInfo.budget}M`;
+    const mySpent = myPlayerInfo.squad ? myPlayerInfo.squad.reduce((s, item) => s + item.price, 0) : 0;
+    document.getElementById('my-budget').textContent = `Spent $${mySpent}M | Left $${myPlayerInfo.budget}M`;
     
     // Toggle host labels
     isHost = myPlayerInfo.isHost;
@@ -362,6 +363,20 @@ function renderActiveAuction(state) {
     document.getElementById('char-name').textContent = character.name;
     document.getElementById('char-desc').textContent = character.description;
     
+    const imgEl = document.getElementById('char-image');
+    if (imgEl) {
+      if (character.image) {
+        imgEl.src = character.image;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+      }
+    }
+    const basePriceEl = document.getElementById('char-base-price');
+    if (basePriceEl) {
+      basePriceEl.textContent = `Base: $${character.basePrice}M`;
+    }
+    
     // Remaining count
     const remainingCount = state.characters.length - state.currentIndex;
     const totalCount = state.characters.length;
@@ -462,7 +477,11 @@ function renderSoldState(state) {
     
     // Set circle emoji & color styling
     const circle = document.getElementById('sold-char-circle');
-    circle.textContent = character.emoji;
+    if (character.image) {
+      circle.innerHTML = `<img src="${character.image}" class="sold-char-img" onerror="this.outerHTML='${character.emoji}'" />`;
+    } else {
+      circle.textContent = character.emoji;
+    }
     const colorTheme = character.color || '#e50914';
     circle.style.setProperty('--card-theme-color', colorTheme);
     
@@ -527,7 +546,7 @@ function renderFinishedState(state) {
   }
 }
 
-// Render Leaderboard & Squad accordion Lists
+// Render Leaderboard & Squad accordion Lists with Spending Tracking
 function renderLeaderboardAndSquads(state) {
   const players = Object.values(state.players);
   
@@ -546,16 +565,31 @@ function renderLeaderboardAndSquads(state) {
     item.className = `leaderboard-item ${isCurrentUser ? 'mine' : ''}`;
     item.style.borderLeft = `4px solid ${p.color}`;
     
+    const totalSpent = p.squad ? p.squad.reduce((sum, item) => sum + item.price, 0) : 0;
+    const budgetLeft = p.budget;
+    const spentPercent = Math.min(100, Math.max(0, (totalSpent / 100) * 100));
     const rating = calculateTeamRating(p.squad, state.mode, state.activeMission);
-    const badgeLabel = state.mode === 'EFFICIENCY' ? `⚡ Efficiency: ${rating}` : `⭐ Rating: ${rating}`;
+    const badgeLabel = state.mode === 'EFFICIENCY' ? `⚡ Eff: ${rating}` : `⭐ Rating: ${rating}`;
     
     item.innerHTML = `
-      <div class="lead-left">
-        <span class="lead-avatar">${p.avatar}</span>
-        <span class="lead-name" style="color:${p.color}">${p.name} ${p.isHost ? '<i class="fa-solid fa-crown lead-crown"></i>' : ''}</span>
+      <div class="lead-top-row">
+        <div class="lead-left">
+          <span class="lead-avatar">${p.avatar}</span>
+          <span class="lead-name" style="color:${p.color}">${p.name} ${p.isHost ? '<i class="fa-solid fa-crown lead-crown"></i>' : ''}</span>
+          <span class="lead-squad-count"><i class="fa-solid fa-user-shield"></i> ${p.squad ? p.squad.length : 0}</span>
+        </div>
+        <div class="lead-right">
+          <span class="lead-rating">${badgeLabel}</span>
+        </div>
       </div>
-      <div class="lead-right">
-        <span class="lead-rating">${badgeLabel}</span>
+      <div class="lead-spending-row">
+        <div class="spending-text">
+          <span class="spent-badge"><i class="fa-solid fa-coins"></i> Spent: <strong>$${totalSpent}M</strong></span>
+          <span class="left-badge"><i class="fa-solid fa-wallet"></i> Remaining: <strong>$${budgetLeft}M</strong></span>
+        </div>
+        <div class="spending-bar-bg">
+          <div class="spending-bar-fill" style="width: ${spentPercent}%; background: linear-gradient(90deg, ${p.color}, #f5a623);"></div>
+        </div>
       </div>
     `;
     listEl.appendChild(item);
@@ -567,7 +601,8 @@ function renderLeaderboardAndSquads(state) {
   
   sortedPlayers.forEach(p => {
     const isCollapsed = collapsedSquads[p.id] === undefined ? true : collapsedSquads[p.id];
-    const totalSpent = p.squad.reduce((sum, item) => sum + item.price, 0);
+    const totalSpent = p.squad ? p.squad.reduce((sum, item) => sum + item.price, 0) : 0;
+    const spentPercent = Math.min(100, Math.max(0, (totalSpent / 100) * 100));
     
     const card = document.createElement('div');
     card.className = 'squad-player-card';
@@ -575,19 +610,20 @@ function renderLeaderboardAndSquads(state) {
     
     // Build characters list HTML
     let charListHtml = '';
-    if (p.squad.length === 0) {
+    if (!p.squad || p.squad.length === 0) {
       charListHtml = `<div class="squad-empty-txt">No characters drafted yet.</div>`;
     } else {
       charListHtml = `<div class="squad-item-grid">`;
       p.squad.forEach(c => {
         charListHtml += `
-          <div class="squad-char-row" style="background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, ${c.gradient ? c.gradient.substring(c.gradient.indexOf('#')) : 'rgba(255,255,255,0.05)'} 100%)">
+          <div class="squad-char-row" style="background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, ${c.gradient ? c.gradient.substring(c.gradient.indexOf('#')) : 'rgba(255,255,255,0.05)'} 100%)">
             <div class="scr-left">
-              <span>${c.emoji}</span>
-              <span>${c.name}</span>
+              ${c.image ? `<img src="${c.image}" class="scr-thumb" onerror="this.style.display='none'" />` : ''}
+              <span class="scr-emoji">${c.emoji}</span>
+              <span class="scr-name">${c.name}</span>
               <span class="scr-role">${c.role}</span>
             </div>
-            <div class="scr-price">$${c.price}M</div>
+            <div class="scr-price">Bought: <strong>$${c.price}M</strong></div>
           </div>
         `;
       });
@@ -596,13 +632,19 @@ function renderLeaderboardAndSquads(state) {
     
     card.innerHTML = `
       <div class="squad-player-header" onclick="toggleSquadCollapse('${p.id}')">
-        <div class="sph-left">
-          <span>${p.avatar}</span>
-          <span style="color:${p.color}">${p.name}</span>
+        <div class="sph-info">
+          <div class="sph-left">
+            <span class="sph-avatar">${p.avatar}</span>
+            <span class="sph-name" style="color:${p.color}">${p.name}</span>
+            <span class="squad-count-pill">${p.squad ? p.squad.length : 0} Heroes</span>
+          </div>
+          <div class="sph-right">
+            <span class="spent-val">Spent: <strong>$${totalSpent}M</strong> / $100M</span>
+            <i class="fa-solid fa-chevron-${isCollapsed ? 'down' : 'up'}"></i>
+          </div>
         </div>
-        <div class="sph-right">
-          <span>Spent: $${totalSpent}M</span>
-          <i class="fa-solid fa-chevron-${isCollapsed ? 'down' : 'up'}"></i>
+        <div class="squad-spending-mini-bar">
+          <div class="mini-bar-fill" style="width: ${spentPercent}%; background: ${p.color};"></div>
         </div>
       </div>
       <div class="squad-player-body ${isCollapsed ? '' : 'active'}">

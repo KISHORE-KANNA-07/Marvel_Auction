@@ -340,6 +340,7 @@ function processSale(room) {
       role: character.role,
       price: room.currentBid,
       emoji: character.emoji,
+      image: character.image,
       gradient: character.gradient,
       stats: character.stats // Store stats for Team Rating calculation
     });
@@ -722,11 +723,6 @@ io.on('connection', (socket) => {
         room.isPaused = !room.isPaused;
         addSystemMessage(room, room.isPaused ? "⏸️ The auction has been PAUSED by the host." : "▶️ The auction has been RESUMED by the host.");
         io.to(roomCode).emit('state-update', cleanRoomStateForClient(room));
-      }
-    } else if (action === 'sell') {
-      if (room.status === 'AUCTION') {
-        addSystemMessage(room, "⚡ Host forced an instant sale!");
-        processSale(room);
       }
     } else if (action === 'reset') {
       resetRoomState(room);

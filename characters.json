@@ -4,329 +4,989 @@
     "name": "Iron Man",
     "role": "Avenger",
     "basePrice": 10,
-    "stats": { "power": 85, "intelligence": 100, "speed": 80, "durability": 85, "combat": 70 },
+    "stats": {
+      "power": 85,
+      "intelligence": 100,
+      "speed": 80,
+      "durability": 85,
+      "combat": 70
+    },
     "description": "Genius, billionaire, playboy, philanthropist. Wears advanced powered armor.",
     "color": "#f12711",
     "gradient": "linear-gradient(135deg, #e50914 0%, #f5a623 100%)",
-    "emoji": "🤖"
+    "emoji": "🤖",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/346-iron-man.jpg"
   },
   {
     "id": "spiderman",
     "name": "Spider-Man",
     "role": "Avenger",
     "basePrice": 8,
-    "stats": { "power": 75, "intelligence": 90, "speed": 95, "durability": 75, "combat": 85 },
+    "stats": {
+      "power": 75,
+      "intelligence": 90,
+      "speed": 95,
+      "durability": 75,
+      "combat": 85
+    },
     "description": "Friendly neighborhood hero with spider-like abilities and web-shooters.",
     "color": "#0052cc",
     "gradient": "linear-gradient(135deg, #0052cc 0%, #ff1a1a 100%)",
-    "emoji": "🕷️"
+    "emoji": "🕷️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/620-spider-man.jpg"
   },
   {
     "id": "thor",
     "name": "Thor",
     "role": "Avenger",
     "basePrice": 12,
-    "stats": { "power": 100, "intelligence": 70, "speed": 85, "durability": 95, "combat": 90 },
+    "stats": {
+      "power": 100,
+      "intelligence": 70,
+      "speed": 85,
+      "durability": 95,
+      "combat": 90
+    },
     "description": "The God of Thunder, wielding the mystical hammer Mjolnir.",
     "color": "#00c6ff",
     "gradient": "linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)",
-    "emoji": "⚡"
+    "emoji": "⚡",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/659-thor.jpg"
   },
   {
     "id": "captainamerica",
     "name": "Captain America",
     "role": "Avenger",
     "basePrice": 8,
-    "stats": { "power": 65, "intelligence": 85, "speed": 75, "durability": 80, "combat": 100 },
+    "stats": {
+      "power": 65,
+      "intelligence": 85,
+      "speed": 75,
+      "durability": 80,
+      "combat": 100
+    },
     "description": "Super-soldier and patriotic leader wielding a vibranium shield.",
     "color": "#002244",
     "gradient": "linear-gradient(135deg, #002244 0%, #3b5998 100%)",
-    "emoji": "🛡️"
+    "emoji": "🛡️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/149-captain-america.jpg"
   },
   {
     "id": "hulk",
     "name": "Hulk",
     "role": "Avenger",
     "basePrice": 11,
-    "stats": { "power": 100, "intelligence": 50, "speed": 70, "durability": 100, "combat": 75 },
+    "stats": {
+      "power": 100,
+      "intelligence": 50,
+      "speed": 70,
+      "durability": 100,
+      "combat": 75
+    },
     "description": "A green-skinned, hulking monster with limitless physical strength driven by rage.",
     "color": "#11998e",
     "gradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
-    "emoji": "🟢"
+    "emoji": "🟢",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/332-hulk.jpg"
   },
   {
     "id": "blackwidow",
     "name": "Black Widow",
     "role": "Avenger",
     "basePrice": 6,
-    "stats": { "power": 50, "intelligence": 85, "speed": 80, "durability": 60, "combat": 95 },
+    "stats": {
+      "power": 50,
+      "intelligence": 85,
+      "speed": 80,
+      "durability": 60,
+      "combat": 95
+    },
     "description": "World-class spy, master martial artist, and tactical expert.",
     "color": "#1c1c1c",
     "gradient": "linear-gradient(135deg, #1c1c1c 0%, #4a00e0 100%)",
-    "emoji": "🕷️"
+    "emoji": "🕷️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/107-black-widow.jpg"
   },
   {
     "id": "doctorstrange",
     "name": "Doctor Strange",
     "role": "Cosmic",
     "basePrice": 11,
-    "stats": { "power": 95, "intelligence": 95, "speed": 70, "durability": 80, "combat": 75 },
+    "stats": {
+      "power": 95,
+      "intelligence": 95,
+      "speed": 70,
+      "durability": 80,
+      "combat": 75
+    },
     "description": "The Sorcerer Supreme, defender of Earth against magical threats.",
     "color": "#7f00ff",
     "gradient": "linear-gradient(135deg, #7f00ff 0%, #e100ff 100%)",
-    "emoji": "🔮"
+    "emoji": "🔮",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/226-doctor-strange.jpg"
   },
   {
     "id": "scarletwitch",
     "name": "Scarlet Witch",
     "role": "Mutant",
     "basePrice": 12,
-    "stats": { "power": 98, "intelligence": 80, "speed": 75, "durability": 70, "combat": 70 },
+    "stats": {
+      "power": 98,
+      "intelligence": 80,
+      "speed": 75,
+      "durability": 70,
+      "combat": 70
+    },
     "description": "Possesses reality-warping chaos magic and telekinetic powers.",
     "color": "#b20a2c",
     "gradient": "linear-gradient(135deg, #b20a2c 0%, #fffbd5 100%)",
-    "emoji": "🔴"
+    "emoji": "🔴",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/579-scarlet-witch.jpg"
   },
   {
     "id": "blackpanther",
     "name": "Black Panther",
     "role": "Avenger",
     "basePrice": 9,
-    "stats": { "power": 75, "intelligence": 90, "speed": 85, "durability": 85, "combat": 95 },
+    "stats": {
+      "power": 75,
+      "intelligence": 90,
+      "speed": 85,
+      "durability": 85,
+      "combat": 95
+    },
     "description": "King of Wakanda, enhanced by a heart-shaped herb and a vibranium suit.",
     "color": "#000428",
     "gradient": "linear-gradient(135deg, #000428 0%, #004e92 100%)",
-    "emoji": "🐾"
+    "emoji": "🐾",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/106-black-panther.jpg"
   },
   {
     "id": "wolverine",
     "name": "Wolverine",
     "role": "Mutant",
     "basePrice": 9,
-    "stats": { "power": 80, "intelligence": 70, "speed": 80, "durability": 100, "combat": 95 },
+    "stats": {
+      "power": 80,
+      "intelligence": 70,
+      "speed": 80,
+      "durability": 100,
+      "combat": 95
+    },
     "description": "Mutant with a rapid healing factor, enhanced senses, and adamantium claws.",
     "color": "#ffd200",
     "gradient": "linear-gradient(135deg, #ffd200 0%, #f7971e 100%)",
-    "emoji": "🐺"
+    "emoji": "🐺",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/717-wolverine.jpg"
   },
   {
     "id": "deadpool",
     "name": "Deadpool",
     "role": "Mutant",
     "basePrice": 8,
-    "stats": { "power": 75, "intelligence": 75, "speed": 80, "durability": 100, "combat": 90 },
+    "stats": {
+      "power": 75,
+      "intelligence": 75,
+      "speed": 80,
+      "durability": 100,
+      "combat": 90
+    },
     "description": "The Merc with a Mouth. Extremely regenerative and completely unpredictable.",
     "color": "#870000",
     "gradient": "linear-gradient(135deg, #870000 0%, #190a05 100%)",
-    "emoji": "⚔️"
+    "emoji": "⚔️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/213-deadpool.jpg"
   },
   {
     "id": "thanos",
     "name": "Thanos",
     "role": "Villain",
     "basePrice": 15,
-    "stats": { "power": 100, "intelligence": 95, "speed": 75, "durability": 100, "combat": 90 },
+    "stats": {
+      "power": 100,
+      "intelligence": 95,
+      "speed": 75,
+      "durability": 100,
+      "combat": 90
+    },
     "description": "The Mad Titan seeking the Infinity Stones to bring balance to the universe.",
     "color": "#3f2b96",
     "gradient": "linear-gradient(135deg, #3f2b96 0%, #a8c0ff 100%)",
-    "emoji": "👾"
+    "emoji": "👾",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/655-thanos.jpg"
   },
   {
     "id": "loki",
     "name": "Loki",
     "role": "Villain",
     "basePrice": 8,
-    "stats": { "power": 80, "intelligence": 95, "speed": 75, "durability": 80, "combat": 80 },
+    "stats": {
+      "power": 80,
+      "intelligence": 95,
+      "speed": 75,
+      "durability": 80,
+      "combat": 80
+    },
     "description": "The God of Mischief. Master of illusions, shapeshifting, and deception.",
     "color": "#134e5e",
     "gradient": "linear-gradient(135deg, #134e5e 0%, #71b280 100%)",
-    "emoji": "👑"
+    "emoji": "👑",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/414-loki.jpg"
   },
   {
     "id": "venom",
     "name": "Venom",
     "role": "Villain",
     "basePrice": 8,
-    "stats": { "power": 85, "intelligence": 70, "speed": 80, "durability": 90, "combat": 85 },
+    "stats": {
+      "power": 85,
+      "intelligence": 70,
+      "speed": 80,
+      "durability": 90,
+      "combat": 85
+    },
     "description": "Alien symbiote bonded with Eddie Brock, granting spider-like powers and raw fury.",
     "color": "#0f2027",
     "gradient": "linear-gradient(135deg, #0f2027 0%, #203a43 100%)",
-    "emoji": "🧛"
+    "emoji": "🧛",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/687-venom.jpg"
   },
   {
     "id": "magneto",
     "name": "Magneto",
     "role": "Mutant",
     "basePrice": 10,
-    "stats": { "power": 95, "intelligence": 95, "speed": 75, "durability": 85, "combat": 80 },
+    "stats": {
+      "power": 95,
+      "intelligence": 95,
+      "speed": 75,
+      "durability": 85,
+      "combat": 80
+    },
     "description": "Mutant leader with the power to control magnetic fields and metals.",
     "color": "#4b1248",
     "gradient": "linear-gradient(135deg, #4b1248 0%, #f0c27b 100%)",
-    "emoji": "🧲"
+    "emoji": "🧲",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/423-magneto.jpg"
   },
   {
     "id": "storm",
     "name": "Storm",
     "role": "Mutant",
     "basePrice": 8,
-    "stats": { "power": 90, "intelligence": 80, "speed": 85, "durability": 75, "combat": 80 },
+    "stats": {
+      "power": 90,
+      "intelligence": 80,
+      "speed": 85,
+      "durability": 75,
+      "combat": 80
+    },
     "description": "Mutant with the ability to control and manipulate weather patterns.",
     "color": "#2c3e50",
     "gradient": "linear-gradient(135deg, #2c3e50 0%, #fd746c 100%)",
-    "emoji": "⛈️"
+    "emoji": "⛈️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/638-storm.jpg"
   },
   {
     "id": "silversurfer",
     "name": "Silver Surfer",
     "role": "Cosmic",
     "basePrice": 11,
-    "stats": { "power": 98, "intelligence": 85, "speed": 100, "durability": 95, "combat": 75 },
+    "stats": {
+      "power": 98,
+      "intelligence": 85,
+      "speed": 100,
+      "durability": 95,
+      "combat": 75
+    },
     "description": "Cosmic traveler imbued with the Power Cosmic and a boarding surfboard.",
     "color": "#cfd9df",
     "gradient": "linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)",
-    "emoji": "🏄"
+    "emoji": "🏄",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/598-silver-surfer.jpg"
   },
   {
     "id": "captainmarvel",
     "name": "Captain Marvel",
     "role": "Cosmic",
     "basePrice": 12,
-    "stats": { "power": 100, "intelligence": 80, "speed": 95, "durability": 95, "combat": 85 },
+    "stats": {
+      "power": 100,
+      "intelligence": 80,
+      "speed": 95,
+      "durability": 95,
+      "combat": 85
+    },
     "description": "Imbued with cosmic energy, possessing vast strength, flight, and energy blasts.",
     "color": "#e65c00",
     "gradient": "linear-gradient(135deg, #e65c00 0%, #F9D423 100%)",
-    "emoji": "💫"
+    "emoji": "💫",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/156-captain-marvel.jpg"
   },
   {
     "id": "daredevil",
     "name": "Daredevil",
     "role": "Defender",
     "basePrice": 5,
-    "stats": { "power": 55, "intelligence": 85, "speed": 80, "durability": 70, "combat": 100 },
+    "stats": {
+      "power": 55,
+      "intelligence": 85,
+      "speed": 80,
+      "durability": 70,
+      "combat": 100
+    },
     "description": "Blind lawyer with radar senses and peerless martial arts mastery.",
     "color": "#800000",
     "gradient": "linear-gradient(135deg, #800000 0%, #ff1a1a 100%)",
-    "emoji": "😈"
+    "emoji": "😈",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/201-daredevil.jpg"
   },
   {
     "id": "ghostrider",
     "name": "Ghost Rider",
     "role": "Cosmic",
     "basePrice": 9,
-    "stats": { "power": 90, "intelligence": 70, "speed": 85, "durability": 95, "combat": 80 },
+    "stats": {
+      "power": 90,
+      "intelligence": 70,
+      "speed": 85,
+      "durability": 95,
+      "combat": 80
+    },
     "description": "Vengeful spirit riding a hellfire motorcycle, wielding the Penance Stare.",
     "color": "#f12711",
     "gradient": "linear-gradient(135deg, #f12711 0%, #3a6073 100%)",
-    "emoji": "💀"
+    "emoji": "💀",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/280-ghost-rider.jpg"
   },
   {
     "id": "groot",
     "name": "Groot",
     "role": "Cosmic",
     "basePrice": 7,
-    "stats": { "power": 85, "intelligence": 60, "speed": 50, "durability": 95, "combat": 70 },
+    "stats": {
+      "power": 85,
+      "intelligence": 60,
+      "speed": 50,
+      "durability": 95,
+      "combat": 70
+    },
     "description": "An tree-like extraterrestrial creature. \"I am Groot.\"",
     "color": "#3d9970",
     "gradient": "linear-gradient(135deg, #13f500 0%, #3d9970 100%)",
-    "emoji": "🌳"
+    "emoji": "🌳",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/303-groot.jpg"
   },
   {
     "id": "starlord",
     "name": "Star-Lord",
     "role": "Cosmic",
     "basePrice": 6,
-    "stats": { "power": 65, "intelligence": 80, "speed": 75, "durability": 70, "combat": 80 },
+    "stats": {
+      "power": 65,
+      "intelligence": 80,
+      "speed": 75,
+      "durability": 70,
+      "combat": 80
+    },
     "description": "Leader of the Guardians of the Galaxy. Legendary outlaw (or so he says).",
     "color": "#6441a5",
     "gradient": "linear-gradient(135deg, #6441a5 0%, #2a0845 100%)",
-    "emoji": "🎧"
+    "emoji": "🎧",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/630-star-lord.jpg"
   },
   {
     "id": "greengoblin",
     "name": "Green Goblin",
     "role": "Villain",
     "basePrice": 7,
-    "stats": { "power": 75, "intelligence": 90, "speed": 80, "durability": 80, "combat": 80 },
+    "stats": {
+      "power": 75,
+      "intelligence": 90,
+      "speed": 80,
+      "durability": 80,
+      "combat": 80
+    },
     "description": "Crazed industrialist on a glider wielding pumpkin bombs.",
     "color": "#5a3f37",
     "gradient": "linear-gradient(135deg, #2c3e50 0%, #000000 100%)",
-    "emoji": "👺"
+    "emoji": "👺",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/299-green-goblin.jpg"
   },
   {
     "id": "hawkeye",
     "name": "Hawkeye",
     "role": "Avenger",
     "basePrice": 5,
-    "stats": { "power": 50, "intelligence": 80, "speed": 75, "durability": 60, "combat": 90 },
+    "stats": {
+      "power": 50,
+      "intelligence": 80,
+      "speed": 75,
+      "durability": 60,
+      "combat": 90
+    },
     "description": "Master archer who never misses, using an array of trick arrows.",
     "color": "#360033",
     "gradient": "linear-gradient(135deg, #360033 0%, #0b8793 100%)",
-    "emoji": "🏹"
+    "emoji": "🏹",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/313-hawkeye.jpg"
   },
   {
     "id": "drdoom",
     "name": "Doctor Doom",
     "role": "Villain",
     "basePrice": 14,
-    "stats": { "power": 95, "intelligence": 100, "speed": 75, "durability": 95, "combat": 85 },
+    "stats": {
+      "power": 95,
+      "intelligence": 100,
+      "speed": 75,
+      "durability": 95,
+      "combat": 85
+    },
     "description": "Monarch of Latveria. Master of both cutting-edge science and sorcery.",
     "color": "#1f4037",
     "gradient": "linear-gradient(135deg, #1f4037 0%, #99f2c8 100%)",
-    "emoji": "🛡️"
+    "emoji": "🛡️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/222-doctor-doom.jpg"
   },
   {
     "id": "vision",
     "name": "Vision",
     "role": "Avenger",
     "basePrice": 9,
-    "stats": { "power": 90, "intelligence": 95, "speed": 80, "durability": 95, "combat": 75 },
+    "stats": {
+      "power": 90,
+      "intelligence": 95,
+      "speed": 80,
+      "durability": 95,
+      "combat": 75
+    },
     "description": "Synthezoid created from vibranium, driven by the Mind Stone.",
     "color": "#00b09b",
     "gradient": "linear-gradient(135deg, #00b09b 0%, #96c93d 100%)",
-    "emoji": "🟡"
+    "emoji": "🟡",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/697-vision.jpg"
   },
   {
     "id": "antman",
     "name": "Ant-Man",
     "role": "Avenger",
     "basePrice": 6,
-    "stats": { "power": 60, "intelligence": 85, "speed": 75, "durability": 70, "combat": 75 },
+    "stats": {
+      "power": 60,
+      "intelligence": 85,
+      "speed": 75,
+      "durability": 70,
+      "combat": 75
+    },
     "description": "Can shrink to subatomic sizes or grow into a towering giant.",
     "color": "#1e130c",
     "gradient": "linear-gradient(135deg, #1e130c 0%, #9a0606 100%)",
-    "emoji": "🐜"
+    "emoji": "🐜",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/30-ant-man.jpg"
   },
   {
     "id": "blackcat",
     "name": "Black Cat",
     "role": "Defender",
     "basePrice": 5,
-    "stats": { "power": 55, "intelligence": 80, "speed": 85, "durability": 60, "combat": 80 },
+    "stats": {
+      "power": 55,
+      "intelligence": 80,
+      "speed": 85,
+      "durability": 60,
+      "combat": 80
+    },
     "description": "Cat burglar with probability-altering \"bad luck\" powers.",
     "color": "#232526",
     "gradient": "linear-gradient(135deg, #232526 0%, #414345 100%)",
-    "emoji": "🐱"
+    "emoji": "🐱",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/99-black-cat.jpg"
   },
   {
     "id": "mysterio",
     "name": "Mysterio",
     "role": "Villain",
     "basePrice": 6,
-    "stats": { "power": 60, "intelligence": 90, "speed": 70, "durability": 65, "combat": 75 },
+    "stats": {
+      "power": 60,
+      "intelligence": 90,
+      "speed": 70,
+      "durability": 65,
+      "combat": 75
+    },
     "description": "Special effects wizard who uses holograms and drones to create massive illusions.",
     "color": "#02aab0",
     "gradient": "linear-gradient(135deg, #02aab0 0%, #00cdac 100%)",
-    "emoji": "🔮"
+    "emoji": "🔮",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/479-mysterio.jpg"
   },
   {
     "id": "punisher",
     "name": "Punisher",
     "role": "Defender",
     "basePrice": 6,
-    "stats": { "power": 60, "intelligence": 80, "speed": 70, "durability": 80, "combat": 90 },
+    "stats": {
+      "power": 60,
+      "intelligence": 80,
+      "speed": 70,
+      "durability": 80,
+      "combat": 90
+    },
     "description": "One-man army waged on a relentless crime war with lethal arsenal.",
     "color": "#141e30",
     "gradient": "linear-gradient(135deg, #141e30 0%, #243b55 100%)",
-    "emoji": "💀"
+    "emoji": "💀",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/530-punisher.jpg"
+  },
+  {
+    "id": "moonknight",
+    "name": "Moon Knight",
+    "role": "Defender",
+    "basePrice": 8,
+    "stats": {
+      "power": 75,
+      "intelligence": 75,
+      "speed": 80,
+      "durability": 85,
+      "combat": 90
+    },
+    "description": "Fist of Khonshu, wielding lunar-powered armor and unpredictable fighting styles.",
+    "color": "#e0e0e0",
+    "gradient": "linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)",
+    "emoji": "🌙",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/458-moon-knight.jpg"
+  },
+  {
+    "id": "shangchi",
+    "name": "Shang-Chi",
+    "role": "Avenger",
+    "basePrice": 9,
+    "stats": {
+      "power": 85,
+      "intelligence": 80,
+      "speed": 90,
+      "durability": 80,
+      "combat": 100
+    },
+    "description": "Master of Kung Fu and wielder of the ancient mystical Ten Rings.",
+    "color": "#cb2d3e",
+    "gradient": "linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%)",
+    "emoji": "🥋",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/589-shang-chi.jpg"
+  },
+  {
+    "id": "milesmorales",
+    "name": "Miles Morales",
+    "role": "Avenger",
+    "basePrice": 9,
+    "stats": {
+      "power": 80,
+      "intelligence": 85,
+      "speed": 95,
+      "durability": 75,
+      "combat": 85
+    },
+    "description": "Brooklyn's Spider-Man equipped with bio-electric Venom Blasts and camouflage.",
+    "color": "#ed213a",
+    "gradient": "linear-gradient(135deg, #ed213a 0%, #93291e 100%)",
+    "emoji": "🕸️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/622-spider-man-ii.jpg"
+  },
+  {
+    "id": "katebishop",
+    "name": "Kate Bishop",
+    "role": "Avenger",
+    "basePrice": 5,
+    "stats": {
+      "power": 50,
+      "intelligence": 85,
+      "speed": 80,
+      "durability": 60,
+      "combat": 88
+    },
+    "description": "Prodigious archer and sharp-witted protégé of Clint Barton.",
+    "color": "#8e44ad",
+    "gradient": "linear-gradient(135deg, #8e44ad 0%, #3498db 100%)",
+    "emoji": "🎯",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/315-hawkeye-ii.jpg"
+  },
+  {
+    "id": "msmarvel",
+    "name": "Ms. Marvel",
+    "role": "Avenger",
+    "basePrice": 6,
+    "stats": {
+      "power": 70,
+      "intelligence": 85,
+      "speed": 75,
+      "durability": 75,
+      "combat": 70
+    },
+    "description": "Jersey City superhero who harnesses light constructs and embiggening powers.",
+    "color": "#f39c12",
+    "gradient": "linear-gradient(135deg, #f39c12 0%, #d35400 100%)",
+    "emoji": "🖐️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/465-ms-marvel-ii.jpg"
+  },
+  {
+    "id": "shehulk",
+    "name": "She-Hulk",
+    "role": "Avenger",
+    "basePrice": 9,
+    "stats": {
+      "power": 92,
+      "intelligence": 90,
+      "speed": 75,
+      "durability": 95,
+      "combat": 80
+    },
+    "description": "Super-strong lawyer who balances courtroom victories with gamma-powered strength.",
+    "color": "#27ae60",
+    "gradient": "linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)",
+    "emoji": "⚖️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/589-she-hulk.jpg"
+  },
+  {
+    "id": "adamwarlock",
+    "name": "Adam Warlock",
+    "role": "Cosmic",
+    "basePrice": 12,
+    "stats": {
+      "power": 96,
+      "intelligence": 88,
+      "speed": 90,
+      "durability": 95,
+      "combat": 82
+    },
+    "description": "Genetically engineered perfect human wielding quantum magic and cosmic powers.",
+    "color": "#f1c40f",
+    "gradient": "linear-gradient(135deg, #f1c40f 0%, #e67e22 100%)",
+    "emoji": "☀️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/705-warlock.jpg"
+  },
+  {
+    "id": "namor",
+    "name": "Namor",
+    "role": "Mutant",
+    "basePrice": 9,
+    "stats": {
+      "power": 90,
+      "intelligence": 82,
+      "speed": 88,
+      "durability": 90,
+      "combat": 92
+    },
+    "description": "Sub-Mariner king of Talokan with winged ankles and oceanic fury.",
+    "color": "#16a085",
+    "gradient": "linear-gradient(135deg, #16a085 0%, #2c3e50 100%)",
+    "emoji": "🌊",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/481-namor.jpg"
+  },
+  {
+    "id": "gorr",
+    "name": "Gorr the God Butcher",
+    "role": "Villain",
+    "basePrice": 13,
+    "stats": {
+      "power": 97,
+      "intelligence": 85,
+      "speed": 80,
+      "durability": 95,
+      "combat": 92
+    },
+    "description": "Galactic assassin armed with All-Black the Necrosword to slay deities.",
+    "color": "#34495e",
+    "gradient": "linear-gradient(135deg, #2c3e50 0%, #000000 100%)",
+    "emoji": "🗡️",
+    "image": "https://upload.wikimedia.org/wikipedia/en/2/2f/Gorr_the_God_Butcher.jpg"
+  },
+  {
+    "id": "kang",
+    "name": "Kang the Conqueror",
+    "role": "Villain",
+    "basePrice": 14,
+    "stats": {
+      "power": 94,
+      "intelligence": 100,
+      "speed": 85,
+      "durability": 90,
+      "combat": 88
+    },
+    "description": "Time-traveling warlord equipped with 31st-century technology and multiverse variants.",
+    "color": "#9b59b6",
+    "gradient": "linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%)",
+    "emoji": "⏳",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/379-kang.jpg"
+  },
+  {
+    "id": "cyclops",
+    "name": "Cyclops",
+    "role": "Mutant",
+    "basePrice": 8,
+    "stats": {
+      "power": 85,
+      "intelligence": 88,
+      "speed": 75,
+      "durability": 75,
+      "combat": 92
+    },
+    "description": "X-Men tactical leader emitting high-powered ruby-quartz optic energy blasts.",
+    "color": "#c0392b",
+    "gradient": "linear-gradient(135deg, #c0392b 0%, #e74c3c 100%)",
+    "emoji": "🕶️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/196-cyclops.jpg"
+  },
+  {
+    "id": "jean_grey",
+    "name": "Jean Grey",
+    "role": "Mutant",
+    "basePrice": 13,
+    "stats": {
+      "power": 100,
+      "intelligence": 90,
+      "speed": 85,
+      "durability": 85,
+      "combat": 80
+    },
+    "description": "Omega-level telepath and telekinetic avatar of the cosmic Phoenix Force.",
+    "color": "#e67e22",
+    "gradient": "linear-gradient(135deg, #e67e22 0%, #d35400 100%)",
+    "emoji": "🔥",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/514-phoenix.jpg"
+  },
+  {
+    "id": "beast",
+    "name": "Beast",
+    "role": "Mutant",
+    "basePrice": 7,
+    "stats": {
+      "power": 75,
+      "intelligence": 98,
+      "speed": 80,
+      "durability": 80,
+      "combat": 85
+    },
+    "description": "Blue-furred mutant genius biochemist combining intellect with superhuman agility.",
+    "color": "#2980b9",
+    "gradient": "linear-gradient(135deg, #2980b9 0%, #3498db 100%)",
+    "emoji": "🧠",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/75-beast.jpg"
+  },
+  {
+    "id": "gambit",
+    "name": "Gambit",
+    "role": "Mutant",
+    "basePrice": 7,
+    "stats": {
+      "power": 78,
+      "intelligence": 78,
+      "speed": 85,
+      "durability": 72,
+      "combat": 88
+    },
+    "description": "Cajun thief charging playing cards and bo staff with explosive kinetic energy.",
+    "color": "#8e44ad",
+    "gradient": "linear-gradient(135deg, #9b59b6 0%, #e74c3c 100%)",
+    "emoji": "🃏",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/274-gambit.jpg"
+  },
+  {
+    "id": "rogue",
+    "name": "Rogue",
+    "role": "Mutant",
+    "basePrice": 9,
+    "stats": {
+      "power": 88,
+      "intelligence": 75,
+      "speed": 82,
+      "durability": 88,
+      "combat": 85
+    },
+    "description": "Absorbs powers, memories, and vitality of anyone she touches.",
+    "color": "#27ae60",
+    "gradient": "linear-gradient(135deg, #27ae60 0%, #f1c40f 100%)",
+    "emoji": "💥",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/567-rogue.jpg"
+  },
+  {
+    "id": "falcon",
+    "name": "Captain America (Sam Wilson)",
+    "role": "Avenger",
+    "basePrice": 8,
+    "stats": {
+      "power": 70,
+      "intelligence": 85,
+      "speed": 92,
+      "durability": 80,
+      "combat": 88
+    },
+    "description": "Aerial combatant equipped with mechanical exo-suit wings and the star-spangled shield.",
+    "color": "#2980b9",
+    "gradient": "linear-gradient(135deg, #2980b9 0%, #c0392b 100%)",
+    "emoji": "🦅",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/251-falcon.jpg"
+  },
+  {
+    "id": "wintersoldier",
+    "name": "Winter Soldier",
+    "role": "Avenger",
+    "basePrice": 8,
+    "stats": {
+      "power": 78,
+      "intelligence": 80,
+      "speed": 82,
+      "durability": 85,
+      "combat": 95
+    },
+    "description": "Bucky Barnes: deadly operative featuring a cybernetic bionic vibranium arm.",
+    "color": "#34495e",
+    "gradient": "linear-gradient(135deg, #34495e 0%, #7f8c8d 100%)",
+    "emoji": "🦾",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/714-winter-soldier.jpg"
+  },
+  {
+    "id": "wasp",
+    "name": "The Wasp",
+    "role": "Avenger",
+    "basePrice": 6,
+    "stats": {
+      "power": 62,
+      "intelligence": 86,
+      "speed": 90,
+      "durability": 68,
+      "combat": 78
+    },
+    "description": "Equipped with bio-synthetic wings, bio-electric stingers, and size-shifting tech.",
+    "color": "#f39c12",
+    "gradient": "linear-gradient(135deg, #f1c40f 0%, #2c3e50 100%)",
+    "emoji": "🐝",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/708-wasp.jpg"
+  },
+  {
+    "id": "rocket",
+    "name": "Rocket Raccoon",
+    "role": "Cosmic",
+    "basePrice": 7,
+    "stats": {
+      "power": 65,
+      "intelligence": 96,
+      "speed": 80,
+      "durability": 65,
+      "combat": 85
+    },
+    "description": "Tactical mastermind and weapons expert with a knack for heavy plasma artillery.",
+    "color": "#e67e22",
+    "gradient": "linear-gradient(135deg, #d35400 0%, #7f8c8d 100%)",
+    "emoji": "🦝",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/566-rocket-raccoon.jpg"
+  },
+  {
+    "id": "gamora",
+    "name": "Gamora",
+    "role": "Cosmic",
+    "basePrice": 8,
+    "stats": {
+      "power": 82,
+      "intelligence": 80,
+      "speed": 85,
+      "durability": 82,
+      "combat": 98
+    },
+    "description": "The deadliest woman in the galaxy, master of bladed weapons and martial arts.",
+    "color": "#16a085",
+    "gradient": "linear-gradient(135deg, #16a085 0%, #8e44ad 100%)",
+    "emoji": "🗡️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/275-gamora.jpg"
+  },
+  {
+    "id": "spidergwen",
+    "name": "Spider-Gwen",
+    "role": "Avenger",
+    "basePrice": 8,
+    "stats": {
+      "power": 75,
+      "intelligence": 86,
+      "speed": 94,
+      "durability": 74,
+      "combat": 84
+    },
+    "description": "Earth-65 drum-playing Spider-Hero with graceful acrobatic combat skill.",
+    "color": "#ecf0f1",
+    "gradient": "linear-gradient(135deg, #e84393 0%, #0984e3 100%)",
+    "emoji": "🕸️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/619-spider-gwen.jpg"
+  },
+  {
+    "id": "blade",
+    "name": "Blade",
+    "role": "Defender",
+    "basePrice": 7,
+    "stats": {
+      "power": 78,
+      "intelligence": 78,
+      "speed": 82,
+      "durability": 85,
+      "combat": 92
+    },
+    "description": "The Daywalker: half-vampire hunter armed with titanium swords and silver stakes.",
+    "color": "#c0392b",
+    "gradient": "linear-gradient(135deg, #c0392b 0%, #2c3e50 100%)",
+    "emoji": "⚔️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/112-blade.jpg"
+  },
+  {
+    "id": "galactus",
+    "name": "Galactus",
+    "role": "Cosmic",
+    "basePrice": 16,
+    "stats": {
+      "power": 100,
+      "intelligence": 100,
+      "speed": 80,
+      "durability": 100,
+      "combat": 85
+    },
+    "description": "Devourer of Worlds possessing cosmic power beyond mortal comprehension.",
+    "color": "#8e44ad",
+    "gradient": "linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%)",
+    "emoji": "🪐",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/273-galactus.jpg"
+  },
+  {
+    "id": "knull",
+    "name": "Knull",
+    "role": "Villain",
+    "basePrice": 15,
+    "stats": {
+      "power": 100,
+      "intelligence": 90,
+      "speed": 80,
+      "durability": 100,
+      "combat": 95
+    },
+    "description": "Eldritch god of the abyss and creator of All-Black and the Symbiotes.",
+    "color": "#2c3e50",
+    "gradient": "linear-gradient(135deg, #000000 0%, #c0392b 100%)",
+    "emoji": "👑",
+    "image": "https://upload.wikimedia.org/wikipedia/en/e/e5/Knull_%28character%29.jpg"
+  },
+  {
+    "id": "sentry",
+    "name": "Sentry",
+    "role": "Cosmic",
+    "basePrice": 15,
+    "stats": {
+      "power": 100,
+      "intelligence": 85,
+      "speed": 98,
+      "durability": 100,
+      "combat": 85
+    },
+    "description": "Golden Guardian with the power of one million exploding suns.",
+    "color": "#f1c40f",
+    "gradient": "linear-gradient(135deg, #f1c40f 0%, #ffffff 100%)",
+    "emoji": "☀️",
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/583-sentry.jpg"
   }
 ]

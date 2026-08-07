@@ -173,7 +173,12 @@
               <div class="character-card glass-panel" id="char-card">
                 <div class="card-header">
                   <span class="char-role-badge" id="char-role">Avenger</span>
-                  <span class="char-emoji-badge" id="char-emoji">🤖</span>
+                  <span class="char-base-price" id="char-base-price">Base: $10M</span>
+                </div>
+
+                <div class="char-portrait-container">
+                  <img id="char-image" src="" alt="Character Image" class="char-portrait-img" onerror="this.style.display='none';">
+                  <span class="char-emoji-overlay" id="char-emoji">🤖</span>
                 </div>
                 
                 <div class="hero-name-container">
@@ -315,9 +320,6 @@
             <div class="host-buttons">
               <button id="btn-host-pause" onclick="sendHostAction('pause')" class="btn btn-sm btn-secondary" title="Pause/Resume Auction">
                 <i class="fa-solid fa-pause"></i> Pause
-              </button>
-              <button id="btn-host-sell" onclick="sendHostAction('sell')" class="btn btn-sm btn-accent" title="Force Sold Instantly">
-                <i class="fa-solid fa-gavel"></i> Sold
               </button>
               <button onclick="sendHostAction('reset')" class="btn btn-sm btn-danger" title="Reset Game State">
                 <i class="fa-solid fa-rotate-left"></i> Reset
