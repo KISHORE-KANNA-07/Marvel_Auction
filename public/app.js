@@ -293,44 +293,69 @@ function renderLobbyWait(state) {
   }
 }
 
-// Helper to calculate Current Team Rating
+// Helper to calculate Current Team Rating with accurate power scaling
 function calculateTeamRating(squad, mode, activeMission) {
   if (!squad || squad.length === 0) return 0;
   
-  let teamScore = 0;
+  let totalBasePower = 0;
+  const rolesSet = new Set();
+  
   squad.forEach(char => {
     if (char.stats) {
-      let charScore = 0;
-      const { power, intelligence, speed, durability, combat } = char.stats;
+      let charPower = 0;
+      const { power = 50, intelligence = 50, speed = 50, durability = 50, combat = 50 } = char.stats;
       
       if (mode === 'MISSION' && activeMission) {
         const w = activeMission.weights || {};
-        charScore = 
-          (power || 0) * (w.power || 0) +
-          (intelligence || 0) * (w.intelligence || 0) +
-          (speed || 0) * (w.speed || 0) +
-          (durability || 0) * (w.durability || 0) +
-          (combat || 0) * (w.combat || 0);
+        charPower = 
+          power * (w.power || 0) +
+          intelligence * (w.intelligence || 0) +
+          speed * (w.speed || 0) +
+          durability * (w.durability || 0) +
+          combat * (w.combat || 0);
           
-        // Add mission role bonus
+        // Mission role bonus
         if (char.role && activeMission.bonusRole && char.role.toLowerCase() === activeMission.bonusRole.toLowerCase()) {
-          charScore += activeMission.bonusAmount;
+          charPower += activeMission.bonusAmount || 15;
         }
+        
+        // High attribute specialization bonus (+8 if top stat >= 90)
+        const maxStat = Math.max(power, intelligence, speed, durability, combat);
+        if (maxStat >= 90) charPower += 8;
       } else {
-        // Default / Highest Total Team Score / Budget Efficiency base rating
-        charScore = ((power || 0) + (intelligence || 0) + (speed || 0) + (durability || 0) + (combat || 0)) / 5;
+        // Championship / Efficiency rating
+        const avg = (power + intelligence + speed + durability + combat) / 5;
+        charPower = avg;
+        
+        // Star Hero Bonus (+8 if character has two stats >= 90)
+        const eliteStatsCount = [power, intelligence, speed, durability, combat].filter(s => s >= 90).length;
+        if (eliteStatsCount >= 2) charPower += 8;
       }
       
-      teamScore += charScore;
+      if (char.role) rolesSet.add(char.role.toLowerCase());
+      totalBasePower += charPower;
     }
   });
   
-  if (mode === 'EFFICIENCY') {
-    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
-    return totalSpent > 0 ? parseFloat((teamScore / totalSpent).toFixed(2)) : 0;
+  // Team Role Diversity Synergy Bonus (+12 points if squad has 3+ distinct roles)
+  let synergyBonus = 0;
+  if (rolesSet.size >= 3) {
+    synergyBonus += 12;
+  } else if (rolesSet.size === 2) {
+    synergyBonus += 5;
   }
   
-  return Math.round(teamScore);
+  // Roster Depth Bonus (+3 points per superhero drafted)
+  const rosterDepthBonus = squad.length * 3;
+  
+  const finalTeamPower = totalBasePower + synergyBonus + rosterDepthBonus;
+  
+  if (mode === 'EFFICIENCY') {
+    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
+    return totalSpent > 0 ? parseFloat((finalTeamPower / totalSpent).toFixed(2)) : 0;
+  }
+  
+  return Math.round(finalTeamPower);
 }
 
 // Helper to find the lowest base price among remaining unsold heroes

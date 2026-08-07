@@ -497,7 +497,22 @@ body {
 #state-waiting p {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
+}
+
+.deck-scaling-badge {
+  font-size: 0.8rem;
+  color: var(--arc-cyan);
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px dashed rgba(0, 242, 254, 0.25);
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+.deck-scaling-badge strong {
+  color: #fff;
 }
 
 .host-only-controls {

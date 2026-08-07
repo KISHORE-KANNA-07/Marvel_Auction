@@ -162,40 +162,65 @@ function generateRandomWeights() {
 function calculateScore(squad, mode, activeMission) {
   if (!squad || squad.length === 0) return 0;
   
-  let teamScore = 0;
+  let totalBasePower = 0;
+  const rolesSet = new Set();
+  
   squad.forEach(char => {
     if (char.stats) {
-      let charScore = 0;
-      const { power, intelligence, speed, durability, combat } = char.stats;
+      let charPower = 0;
+      const { power = 50, intelligence = 50, speed = 50, durability = 50, combat = 50 } = char.stats;
       
       if (mode === 'MISSION' && activeMission) {
         const w = activeMission.weights || {};
-        charScore = 
-          (power || 0) * (w.power || 0) +
-          (intelligence || 0) * (w.intelligence || 0) +
-          (speed || 0) * (w.speed || 0) +
-          (durability || 0) * (w.durability || 0) +
-          (combat || 0) * (w.combat || 0);
+        charPower = 
+          power * (w.power || 0) +
+          intelligence * (w.intelligence || 0) +
+          speed * (w.speed || 0) +
+          durability * (w.durability || 0) +
+          combat * (w.combat || 0);
           
-        // Add mission role bonus
+        // Mission role bonus
         if (char.role && activeMission.bonusRole && char.role.toLowerCase() === activeMission.bonusRole.toLowerCase()) {
-          charScore += activeMission.bonusAmount;
+          charPower += activeMission.bonusAmount || 15;
         }
+        
+        // High attribute specialization bonus (+8 if top stat >= 90)
+        const maxStat = Math.max(power, intelligence, speed, durability, combat);
+        if (maxStat >= 90) charPower += 8;
       } else {
-        // Default / Highest Total Team Score / Budget Efficiency base rating
-        charScore = ((power || 0) + (intelligence || 0) + (speed || 0) + (durability || 0) + (combat || 0)) / 5;
+        // Championship / Efficiency rating
+        const avg = (power + intelligence + speed + durability + combat) / 5;
+        charPower = avg;
+        
+        // Star Hero Bonus (+8 if character has two stats >= 90)
+        const eliteStatsCount = [power, intelligence, speed, durability, combat].filter(s => s >= 90).length;
+        if (eliteStatsCount >= 2) charPower += 8;
       }
       
-      teamScore += charScore;
+      if (char.role) rolesSet.add(char.role.toLowerCase());
+      totalBasePower += charPower;
     }
   });
   
-  if (mode === 'EFFICIENCY') {
-    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
-    return totalSpent > 0 ? parseFloat((teamScore / totalSpent).toFixed(2)) : 0;
+  // Team Role Diversity Synergy Bonus (+12 points if squad has 3+ distinct roles)
+  let synergyBonus = 0;
+  if (rolesSet.size >= 3) {
+    synergyBonus += 12;
+  } else if (rolesSet.size === 2) {
+    synergyBonus += 5;
   }
   
-  return Math.round(teamScore);
+  // Roster Depth Bonus (+3 points per superhero drafted)
+  const rosterDepthBonus = squad.length * 3;
+  
+  const finalTeamPower = totalBasePower + synergyBonus + rosterDepthBonus;
+  
+  if (mode === 'EFFICIENCY') {
+    const totalSpent = squad.reduce((sum, item) => sum + item.price, 0);
+    return totalSpent > 0 ? parseFloat((finalTeamPower / totalSpent).toFixed(2)) : 0;
+  }
+  
+  return Math.round(finalTeamPower);
 }
 
 // Generate unique room code
@@ -247,6 +272,50 @@ function createRoom(partyCode) {
   return room;
 }
 
+// Dynamically balance character deck pool based on player count and mission alignment
+function prepareCharacterDeck(room) {
+  const playerCount = Object.keys(room.players).length || 1;
+  let targetPoolSize = 55;
+  
+  if (playerCount <= 5) {
+    targetPoolSize = 32; // 30-35 range for small lobbies
+  } else if (playerCount <= 9) {
+    targetPoolSize = 42; // 40-45 range for medium lobbies
+  } else {
+    targetPoolSize = Math.min(55, characters.length); // Full pool for 10+ players
+  }
+  
+  let allChars = JSON.parse(JSON.stringify(characters));
+  
+  if (room.mode === 'MISSION' && room.activeMission) {
+    const bonusRole = room.activeMission.bonusRole ? room.activeMission.bonusRole.toLowerCase() : null;
+    
+    // Mission preferred pool (matching bonusRole)
+    const missionPreferred = [];
+    const generalChars = [];
+    
+    allChars.forEach(c => {
+      const cRole = c.role ? c.role.toLowerCase() : '';
+      if (bonusRole && cRole === bonusRole) {
+        missionPreferred.push(c);
+      } else {
+        generalChars.push(c);
+      }
+    });
+    
+    shuffleArray(missionPreferred);
+    shuffleArray(generalChars);
+    
+    // Combine preferred first, then general to reach targetPoolSize
+    let selected = [...missionPreferred, ...generalChars].slice(0, targetPoolSize);
+    room.characters = shuffleArray(selected);
+  } else {
+    room.characters = shuffleArray(allChars).slice(0, targetPoolSize);
+  }
+  
+  addSystemMessage(room, `🎯 Auction Deck Loaded: ${room.characters.length} Superheroes for ${playerCount} participant(s)!`);
+}
+
 // Reset room state
 function resetRoomState(room) {
   stopTimer(room);
@@ -257,7 +326,9 @@ function resetRoomState(room) {
   room.bidHistory = [];
   room.isPaused = false;
   room.timer = 0;
-  room.characters = shuffleArray(JSON.parse(JSON.stringify(characters)));
+  
+  prepareCharacterDeck(room);
+  
   room.heroesSold = 0;
   room.unsoldCount = 0;
   room.highestBid = 0;

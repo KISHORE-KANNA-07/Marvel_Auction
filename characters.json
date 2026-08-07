@@ -3,7 +3,7 @@
     "id": "ironman",
     "name": "Iron Man",
     "role": "Avenger",
-    "basePrice": 10,
+    "basePrice": 5,
     "stats": {
       "power": 85,
       "intelligence": 100,
@@ -21,7 +21,7 @@
     "id": "spiderman",
     "name": "Spider-Man",
     "role": "Avenger",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 90,
@@ -39,7 +39,7 @@
     "id": "thor",
     "name": "Thor",
     "role": "Avenger",
-    "basePrice": 12,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 70,
@@ -57,7 +57,7 @@
     "id": "captainamerica",
     "name": "Captain America",
     "role": "Avenger",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 65,
       "intelligence": 85,
@@ -75,7 +75,7 @@
     "id": "hulk",
     "name": "Hulk",
     "role": "Avenger",
-    "basePrice": 11,
+    "basePrice": 5,
     "stats": {
       "power": 100,
       "intelligence": 50,
@@ -93,7 +93,7 @@
     "id": "blackwidow",
     "name": "Black Widow",
     "role": "Avenger",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 50,
       "intelligence": 85,
@@ -111,7 +111,7 @@
     "id": "doctorstrange",
     "name": "Doctor Strange",
     "role": "Cosmic",
-    "basePrice": 11,
+    "basePrice": 5,
     "stats": {
       "power": 95,
       "intelligence": 95,
@@ -129,7 +129,7 @@
     "id": "scarletwitch",
     "name": "Scarlet Witch",
     "role": "Mutant",
-    "basePrice": 12,
+    "basePrice": 4,
     "stats": {
       "power": 98,
       "intelligence": 80,
@@ -147,7 +147,7 @@
     "id": "blackpanther",
     "name": "Black Panther",
     "role": "Avenger",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 90,
@@ -165,7 +165,7 @@
     "id": "wolverine",
     "name": "Wolverine",
     "role": "Mutant",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 80,
       "intelligence": 70,
@@ -183,7 +183,7 @@
     "id": "deadpool",
     "name": "Deadpool",
     "role": "Mutant",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 75,
@@ -201,7 +201,7 @@
     "id": "thanos",
     "name": "Thanos",
     "role": "Villain",
-    "basePrice": 15,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 95,
@@ -219,7 +219,7 @@
     "id": "loki",
     "name": "Loki",
     "role": "Villain",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 80,
       "intelligence": 95,
@@ -237,7 +237,7 @@
     "id": "venom",
     "name": "Venom",
     "role": "Villain",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 85,
       "intelligence": 70,
@@ -255,7 +255,7 @@
     "id": "magneto",
     "name": "Magneto",
     "role": "Mutant",
-    "basePrice": 10,
+    "basePrice": 5,
     "stats": {
       "power": 95,
       "intelligence": 95,
@@ -273,7 +273,7 @@
     "id": "storm",
     "name": "Storm",
     "role": "Mutant",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 90,
       "intelligence": 80,
@@ -291,7 +291,7 @@
     "id": "silversurfer",
     "name": "Silver Surfer",
     "role": "Cosmic",
-    "basePrice": 11,
+    "basePrice": 6,
     "stats": {
       "power": 98,
       "intelligence": 85,
@@ -309,7 +309,7 @@
     "id": "captainmarvel",
     "name": "Captain Marvel",
     "role": "Cosmic",
-    "basePrice": 12,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 80,
@@ -327,7 +327,7 @@
     "id": "daredevil",
     "name": "Daredevil",
     "role": "Defender",
-    "basePrice": 5,
+    "basePrice": 4,
     "stats": {
       "power": 55,
       "intelligence": 85,
@@ -345,7 +345,7 @@
     "id": "ghostrider",
     "name": "Ghost Rider",
     "role": "Cosmic",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 90,
       "intelligence": 70,
@@ -363,7 +363,7 @@
     "id": "groot",
     "name": "Groot",
     "role": "Cosmic",
-    "basePrice": 7,
+    "basePrice": 4,
     "stats": {
       "power": 85,
       "intelligence": 60,
@@ -381,7 +381,7 @@
     "id": "starlord",
     "name": "Star-Lord",
     "role": "Cosmic",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 65,
       "intelligence": 80,
@@ -399,7 +399,7 @@
     "id": "greengoblin",
     "name": "Green Goblin",
     "role": "Villain",
-    "basePrice": 7,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 90,
@@ -417,7 +417,7 @@
     "id": "hawkeye",
     "name": "Hawkeye",
     "role": "Avenger",
-    "basePrice": 5,
+    "basePrice": 3,
     "stats": {
       "power": 50,
       "intelligence": 80,
@@ -435,7 +435,7 @@
     "id": "drdoom",
     "name": "Doctor Doom",
     "role": "Villain",
-    "basePrice": 14,
+    "basePrice": 6,
     "stats": {
       "power": 95,
       "intelligence": 100,
@@ -453,7 +453,7 @@
     "id": "vision",
     "name": "Vision",
     "role": "Avenger",
-    "basePrice": 9,
+    "basePrice": 6,
     "stats": {
       "power": 90,
       "intelligence": 95,
@@ -471,7 +471,7 @@
     "id": "antman",
     "name": "Ant-Man",
     "role": "Avenger",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 60,
       "intelligence": 85,
@@ -489,7 +489,7 @@
     "id": "blackcat",
     "name": "Black Cat",
     "role": "Defender",
-    "basePrice": 5,
+    "basePrice": 4,
     "stats": {
       "power": 55,
       "intelligence": 80,
@@ -507,7 +507,7 @@
     "id": "mysterio",
     "name": "Mysterio",
     "role": "Villain",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 60,
       "intelligence": 90,
@@ -525,7 +525,7 @@
     "id": "punisher",
     "name": "Punisher",
     "role": "Defender",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 60,
       "intelligence": 80,
@@ -543,7 +543,7 @@
     "id": "moonknight",
     "name": "Moon Knight",
     "role": "Defender",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 75,
@@ -555,13 +555,13 @@
     "color": "#e0e0e0",
     "gradient": "linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)",
     "emoji": "🌙",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/458-moon-knight.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/470-moon-knight.jpg"
   },
   {
     "id": "shangchi",
     "name": "Shang-Chi",
     "role": "Avenger",
-    "basePrice": 9,
+    "basePrice": 6,
     "stats": {
       "power": 85,
       "intelligence": 80,
@@ -573,13 +573,13 @@
     "color": "#cb2d3e",
     "gradient": "linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%)",
     "emoji": "🥋",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/589-shang-chi.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/587-shang-chi.jpg"
   },
   {
     "id": "milesmorales",
     "name": "Miles Morales",
     "role": "Avenger",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 80,
       "intelligence": 85,
@@ -591,13 +591,13 @@
     "color": "#ed213a",
     "gradient": "linear-gradient(135deg, #ed213a 0%, #93291e 100%)",
     "emoji": "🕸️",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/622-spider-man-ii.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/620-spider-man.jpg"
   },
   {
     "id": "katebishop",
     "name": "Kate Bishop",
     "role": "Avenger",
-    "basePrice": 5,
+    "basePrice": 4,
     "stats": {
       "power": 50,
       "intelligence": 85,
@@ -609,13 +609,13 @@
     "color": "#8e44ad",
     "gradient": "linear-gradient(135deg, #8e44ad 0%, #3498db 100%)",
     "emoji": "🎯",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/315-hawkeye-ii.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/314-hawkeye-ii.jpg"
   },
   {
     "id": "msmarvel",
     "name": "Ms. Marvel",
     "role": "Avenger",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 70,
       "intelligence": 85,
@@ -627,13 +627,13 @@
     "color": "#f39c12",
     "gradient": "linear-gradient(135deg, #f39c12 0%, #d35400 100%)",
     "emoji": "🖐️",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/465-ms-marvel-ii.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/477-ms-marvel-ii.jpg"
   },
   {
     "id": "shehulk",
     "name": "She-Hulk",
     "role": "Avenger",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 92,
       "intelligence": 90,
@@ -651,7 +651,7 @@
     "id": "adamwarlock",
     "name": "Adam Warlock",
     "role": "Cosmic",
-    "basePrice": 12,
+    "basePrice": 6,
     "stats": {
       "power": 96,
       "intelligence": 88,
@@ -669,7 +669,7 @@
     "id": "namor",
     "name": "Namor",
     "role": "Mutant",
-    "basePrice": 9,
+    "basePrice": 6,
     "stats": {
       "power": 90,
       "intelligence": 82,
@@ -687,7 +687,7 @@
     "id": "gorr",
     "name": "Gorr the God Butcher",
     "role": "Villain",
-    "basePrice": 13,
+    "basePrice": 6,
     "stats": {
       "power": 97,
       "intelligence": 85,
@@ -699,13 +699,13 @@
     "color": "#34495e",
     "gradient": "linear-gradient(135deg, #2c3e50 0%, #000000 100%)",
     "emoji": "🗡️",
-    "image": "https://upload.wikimedia.org/wikipedia/en/2/2f/Gorr_the_God_Butcher.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/655-thanos.jpg"
   },
   {
     "id": "kang",
     "name": "Kang the Conqueror",
     "role": "Villain",
-    "basePrice": 14,
+    "basePrice": 6,
     "stats": {
       "power": 94,
       "intelligence": 100,
@@ -723,7 +723,7 @@
     "id": "cyclops",
     "name": "Cyclops",
     "role": "Mutant",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 85,
       "intelligence": 88,
@@ -741,7 +741,7 @@
     "id": "jean_grey",
     "name": "Jean Grey",
     "role": "Mutant",
-    "basePrice": 13,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 90,
@@ -753,13 +753,13 @@
     "color": "#e67e22",
     "gradient": "linear-gradient(135deg, #e67e22 0%, #d35400 100%)",
     "emoji": "🔥",
-    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/514-phoenix.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/356-jean-grey.jpg"
   },
   {
     "id": "beast",
     "name": "Beast",
     "role": "Mutant",
-    "basePrice": 7,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 98,
@@ -777,7 +777,7 @@
     "id": "gambit",
     "name": "Gambit",
     "role": "Mutant",
-    "basePrice": 7,
+    "basePrice": 5,
     "stats": {
       "power": 78,
       "intelligence": 78,
@@ -795,7 +795,7 @@
     "id": "rogue",
     "name": "Rogue",
     "role": "Mutant",
-    "basePrice": 9,
+    "basePrice": 5,
     "stats": {
       "power": 88,
       "intelligence": 75,
@@ -813,7 +813,7 @@
     "id": "falcon",
     "name": "Captain America (Sam Wilson)",
     "role": "Avenger",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 70,
       "intelligence": 85,
@@ -831,7 +831,7 @@
     "id": "wintersoldier",
     "name": "Winter Soldier",
     "role": "Avenger",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 78,
       "intelligence": 80,
@@ -849,7 +849,7 @@
     "id": "wasp",
     "name": "The Wasp",
     "role": "Avenger",
-    "basePrice": 6,
+    "basePrice": 4,
     "stats": {
       "power": 62,
       "intelligence": 86,
@@ -867,7 +867,7 @@
     "id": "rocket",
     "name": "Rocket Raccoon",
     "role": "Cosmic",
-    "basePrice": 7,
+    "basePrice": 4,
     "stats": {
       "power": 65,
       "intelligence": 96,
@@ -885,7 +885,7 @@
     "id": "gamora",
     "name": "Gamora",
     "role": "Cosmic",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 82,
       "intelligence": 80,
@@ -903,7 +903,7 @@
     "id": "spidergwen",
     "name": "Spider-Gwen",
     "role": "Avenger",
-    "basePrice": 8,
+    "basePrice": 5,
     "stats": {
       "power": 75,
       "intelligence": 86,
@@ -921,7 +921,7 @@
     "id": "blade",
     "name": "Blade",
     "role": "Defender",
-    "basePrice": 7,
+    "basePrice": 5,
     "stats": {
       "power": 78,
       "intelligence": 78,
@@ -939,7 +939,7 @@
     "id": "galactus",
     "name": "Galactus",
     "role": "Cosmic",
-    "basePrice": 16,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 100,
@@ -957,7 +957,7 @@
     "id": "knull",
     "name": "Knull",
     "role": "Villain",
-    "basePrice": 15,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 90,
@@ -969,13 +969,13 @@
     "color": "#2c3e50",
     "gradient": "linear-gradient(135deg, #000000 0%, #c0392b 100%)",
     "emoji": "👑",
-    "image": "https://upload.wikimedia.org/wikipedia/en/e/e5/Knull_%28character%29.jpg"
+    "image": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/687-venom.jpg"
   },
   {
     "id": "sentry",
     "name": "Sentry",
     "role": "Cosmic",
-    "basePrice": 15,
+    "basePrice": 6,
     "stats": {
       "power": 100,
       "intelligence": 85,
